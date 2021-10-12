@@ -14,6 +14,7 @@ interface StepperProps {
 
 function VerticalLinearStepper(props: StepperProps) {
   const [activeStep, setActiveStep] = React.useState(0);
+  const [completedSteps, setCompletedSteps] = React.useState(new Set<number>()) 
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -27,11 +28,25 @@ function VerticalLinearStepper(props: StepperProps) {
     setActiveStep(stepIndex);
   }
 
+  const isStepCompleted = (stepIndex: number) => completedSteps.has(stepIndex)
+
+  const handleStepToggleCompleted = (stepIndex: number) => {
+    var copiedCompletedSteps = new Set(completedSteps)
+
+    if (isStepCompleted(stepIndex)) {
+      copiedCompletedSteps.delete(stepIndex)
+    } else {
+      copiedCompletedSteps.add(stepIndex)
+    }
+
+    setCompletedSteps(copiedCompletedSteps)
+  }
+
   return (
     <React.Fragment>
       <Stepper nonLinear activeStep={activeStep} orientation="vertical">
         {props.steps.map((step, index) => (
-          <Step key={step.label}>
+          <Step key={step.label} completed={isStepCompleted(index)}>
             <StepButton onClick={() => handleStepClick(index)}>
               {step.label}
             </StepButton>
@@ -39,13 +54,37 @@ function VerticalLinearStepper(props: StepperProps) {
               <Typography>{step.description}</Typography>
               <Box sx={{ mb: 2 }}>
                 <div>
-                  <Button
-                    variant="contained"
-                    onClick={handleNext}
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    {index === props.steps.length - 1 ? 'Finish' : 'Continue'}
-                  </Button>
+                  { !isStepCompleted(index) ? 
+                  <React.Fragment>
+                    <Button
+                      variant="contained"
+                      onClick={() => { handleStepToggleCompleted(index); handleNext() } }
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      Complete and {index === props.steps.length - 1 ? 'Finish' : 'Continue'}
+                    </Button>
+                    <Button
+                      onClick={handleNext}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      {index === props.steps.length - 1 ? 'Finish' : 'Continue'}
+                    </Button>
+                  </React.Fragment> : 
+                  <React.Fragment>
+                    <Button
+                      onClick={handleNext}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      {index === props.steps.length - 1 ? 'Finish' : 'Continue'}
+                    </Button>
+                    <Button
+                      onClick={() => {handleStepToggleCompleted(index)}}
+                      sx={{ mt: 1, mr: 1 }}
+                    >
+                      Unmark Completed
+                    </Button>
+                  </React.Fragment>
+                }
                   <Button
                     disabled={index === 0}
                     onClick={handleBack}
