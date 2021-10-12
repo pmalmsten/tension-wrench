@@ -28,7 +28,8 @@
 		"yzhang.markdown-all-in-one",
 		"zignd.html-css-class-completion",
 		"eamodio.gitlens",
-		"mhutchie.git-graph"
+		"mhutchie.git-graph",
+		"ms-azuretools.vscode-docker"
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
