@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import ProTip from './ProTip';
-import { Box, Button, Paper, Step, StepButton, StepContent, StepLabel, Stepper } from '@mui/material';
+import { Box, Button, Paper, Step, StepButton, StepContent, Stepper } from '@mui/material';
 
 interface DiscussionGuideProps {
   components: string[],
@@ -58,31 +58,35 @@ function VerticalLinearStepper(props: StepperProps) {
                   <React.Fragment>
                     <Button
                       variant="contained"
-                      onClick={() => { handleStepToggleCompleted(index); handleNext() } }
+                      onClick={() => { handleStepToggleCompleted(index); if (index < props.steps.length - 1) handleNext() } }
                       sx={{ mt: 1, mr: 1 }}
                     >
-                      Complete and {index === props.steps.length - 1 ? 'Finish' : 'Continue'}
+                      Complete {index < props.steps.length - 1 ? 'and Continue' : ''}
                     </Button>
-                    <Button
-                      onClick={handleNext}
-                      sx={{ mt: 1, mr: 1 }}
-                    >
-                      {index === props.steps.length - 1 ? 'Finish' : 'Continue'}
-                    </Button>
+                    { index < props.steps.length - 1 &&
+                      <Button
+                        onClick={handleNext}
+                        sx={{ mt: 1, mr: 1 }}
+                      >
+                        Continue
+                      </Button>
+                    }
                   </React.Fragment> : 
                   <React.Fragment>
-                    <Button
-                      onClick={handleNext}
-                      sx={{ mt: 1, mr: 1 }}
-                    >
-                      {index === props.steps.length - 1 ? 'Finish' : 'Continue'}
-                    </Button>
                     <Button
                       onClick={() => {handleStepToggleCompleted(index)}}
                       sx={{ mt: 1, mr: 1 }}
                     >
                       Unmark Completed
                     </Button>
+                    { index < props.steps.length - 1 &&
+                      <Button
+                        onClick={handleNext}
+                        sx={{ mt: 1, mr: 1 }}
+                      >
+                        Continue
+                      </Button>
+                    }
                   </React.Fragment>
                 }
                   <Button
@@ -98,17 +102,6 @@ function VerticalLinearStepper(props: StepperProps) {
           </Step>
         ))}
       </Stepper>
-      {activeStep === props.steps.length && (
-        <Paper square elevation={0} sx={{ p: 3 }}>
-          <Typography>All done!</Typography>
-          <Button
-              onClick={handleBack}
-              sx={{ mt: 1, mr: 1 }}
-            >
-              Back
-            </Button>
-        </Paper>
-      )}
     </React.Fragment> 
   );
 }
