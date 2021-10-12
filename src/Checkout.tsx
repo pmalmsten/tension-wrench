@@ -16,6 +16,7 @@ import Intro from './Intro'
 import ComponentsEditor from './ComponentsEditor';
 import Review from './Review';
 import DataFlowsEditor from './DataFlowsEditor';
+import DiscussionGuide from './DiscussionGuide';
 
 function Copyright() {
   return (
@@ -57,7 +58,7 @@ export default function Checkout() {
 
   const deleteDataFlowsReferencingComponent = (removedComponent: string) => {
     var copiedDataFlowsMap = deepCopyDataFlowsMap()
-    
+
     if (copiedDataFlowsMap.has(removedComponent)) copiedDataFlowsMap.delete(removedComponent)
     Array.from(copiedDataFlowsMap.values()).forEach(destComponents => {
       destComponents.delete(removedComponent)
@@ -135,7 +136,7 @@ export default function Checkout() {
                       addFlow={addDataFlow}
                       removeFlow={removeDataFlow}
                     />,
-                    <Review />
+                    <DiscussionGuide components={components} dataFlows={dataFlows} />
                   ][activeStep]
                 }
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>

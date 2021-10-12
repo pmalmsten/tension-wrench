@@ -3,6 +3,9 @@ import Link from '@mui/material/Link';
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 
+interface ProTipProps {
+}
+
 function LightBulbIcon(props: SvgIconProps) {
   return (
     <SvgIcon {...props}>
@@ -11,12 +14,11 @@ function LightBulbIcon(props: SvgIconProps) {
   );
 }
 
-export default function ProTip() {
+export default function ProTip(props: React.PropsWithChildren<ProTipProps>) {
   return (
     <Typography sx={{ mt: 6, mb: 3 }} color="text.secondary">
       <LightBulbIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-      Pro tip: See more <Link href="https://mui.com/getting-started/templates/">templates</Link> on
-      the MUI documentation.
+      {props.children}
     </Typography>
   );
 }

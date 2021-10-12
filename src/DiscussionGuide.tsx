@@ -1,0 +1,147 @@
+import * as React from 'react';
+import Typography from '@mui/material/Typography';
+import ProTip from './ProTip';
+import { Box, Button, Paper, Step, StepContent, StepLabel, Stepper } from '@mui/material';
+
+interface DiscussionGuideProps {
+  components: string[],
+  dataFlows: Map<string, Set<string>>
+}
+
+interface StepperProps {
+  steps: {label: string, description: string}[]
+}
+
+function VerticalLinearStepper(props: StepperProps) {
+  const [activeStep, setActiveStep] = React.useState(0);
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  return (
+    <React.Fragment>
+      <Stepper activeStep={activeStep} orientation="vertical">
+        {props.steps.map((step, index) => (
+          <Step key={step.label}>
+            <StepLabel>
+              {step.label}
+            </StepLabel>
+            <StepContent>
+              <Typography>{step.description}</Typography>
+              <Box sx={{ mb: 2 }}>
+                <div>
+                  <Button
+                    variant="contained"
+                    onClick={handleNext}
+                    sx={{ mt: 1, mr: 1 }}
+                  >
+                    {index === props.steps.length - 1 ? 'Finish' : 'Continue'}
+                  </Button>
+                  <Button
+                    disabled={index === 0}
+                    onClick={handleBack}
+                    sx={{ mt: 1, mr: 1 }}
+                  >
+                    Back
+                  </Button>
+                </div>
+              </Box>
+            </StepContent>
+          </Step>
+        ))}
+      </Stepper>
+      {activeStep === props.steps.length && (
+        <Paper square elevation={0} sx={{ p: 3 }}>
+          <Typography>All done!</Typography>
+          <Button
+              onClick={handleBack}
+              sx={{ mt: 1, mr: 1 }}
+            >
+              Back
+            </Button>
+        </Paper>
+      )}
+    </React.Fragment> 
+  );
+}
+
+function generateSteps(components: string[], dataFlows: Map<string, Set<string>>): {label: string, description: string}[] {
+  var steps = components.flatMap(component => {
+    var componentSteps = [
+      {
+        label: `${component}: Tampering`,
+        description: "An attacker might try to tamper with this component."
+      },
+      {
+        label: `${component}: Repudiation`,
+        description: "An attacker might try to make an action and later claim they did not take that action, or take that action without having been discovered."
+      },
+      {
+        label: `${component}: Information Disclosure`,
+        description: "An attacker might try to extract data they should not have from this component."
+      },
+      {
+        label: `${component}: Denial of Service`,
+        description: "An attacker might try to cause this component to stop serving legitimate customers/users."
+      },
+      {
+        label: `${component}: Escalation of Privilege`,
+        description: "An attacker might try to take advantage of this component in order to gain access they should not have."
+      }
+    ]
+
+    var dataFlowSteps = Array.from(dataFlows.get(component)?.values() ?? []).flatMap(destComponent => [
+      {
+        label: `${component} <-> ${destComponent}: Spoofing of '${component}' identity`,
+        description: `An attacker might try to pretend to be '${component}' in order to gain access they should not have.`
+      },
+      {
+        label: `${component} <-> ${destComponent}: Spoofing of '${destComponent}' identity`,
+        description: `An attacker might try to pretend to be '${destComponent}' in order to gain access they should not have.`
+      },
+      {
+        label: `${component} <-> ${destComponent}: Tampering`,
+        description: `An attacker might try to alter information as it flows between these components (for example, as messages transit the public internet).`
+      },
+      {
+        label: `${component} <-> ${destComponent}: Information Disclosure`,
+        description: `An attacker might try to spy on information as it flows between these components (for example, as messages transit the public internet).`
+      },
+      {
+        label: `${component} <-> ${destComponent}: Denial of Service`,
+        description: `An attacker might try to disrupt the exchange of information between these components (for example, as messages transit the public internet).`
+      }
+    ])
+
+    return componentSteps.concat(dataFlowSteps)
+  })
+
+  return steps;
+}
+
+export default function DiscussionGuide(props: DiscussionGuideProps) {
+  return (
+    <React.Fragment>
+      <Typography variant="h6" gutterBottom>
+        Discussion Guide
+      </Typography>
+      <p>
+        Now that you've described your system, you're ready to brainstorm what
+        actions attackers might try in order to break in to your system. Grab some
+        teammates and think about the following possiblities. Remember, this is
+        brainstorming - all ideas are fair game, even if you later decide a possible 
+        attack is too unlikely to do anything about.
+      </p>
+      <ProTip>
+        The discussion guide below is based on STRIDE-per-element; see X for detais.
+      </ProTip>
+      <VerticalLinearStepper steps={generateSteps(props.components, props.dataFlows)} />
+      
+    </React.Fragment>
+  );
+}
