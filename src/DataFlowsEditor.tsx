@@ -46,7 +46,7 @@ function NewDataFlowForm(props: {
               disabled={sourceComponent == undefined}
               value={destComponent}
               disablePortal
-              options={props.componentChoices}
+              options={props.componentChoices.filter(choice => choice != sourceComponent)}
               renderInput={(params) => <TextField {...params} label="Destination Component" required />}
             />
           </Grid>
