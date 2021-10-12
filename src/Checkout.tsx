@@ -38,6 +38,7 @@ function getStepContent(step: number) {
     case 1:
       return <PaymentForm />;
     case 2:
+    case 3:
       return <Review />;
     default:
       throw new Error('Unknown step');
@@ -85,18 +86,6 @@ export default function Checkout() {
             ))}
           </Stepper>
           <React.Fragment>
-            {activeStep === steps.length ? (
-              <React.Fragment>
-                <Typography variant="h5" gutterBottom>
-                  Thank you for your order.
-                </Typography>
-                <Typography variant="subtitle1">
-                  Your order number is #2001539. We have emailed your order
-                  confirmation, and will send you an update when your order has
-                  shipped.
-                </Typography>
-              </React.Fragment>
-            ) : (
               <React.Fragment>
                 {getStepContent(activeStep)}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -105,16 +94,17 @@ export default function Checkout() {
                       Back
                     </Button>
                   )}
-                  <Button
-                    variant="contained"
-                    onClick={handleNext}
-                    sx={{ mt: 3, ml: 1 }}
-                  >
-                    {activeStep === steps.length - 1 ? 'Place order' : 'Next'}
-                  </Button>
+                  {activeStep < steps.length - 1 &&
+                    <Button
+                      variant="contained"
+                      onClick={handleNext}
+                      sx={{ mt: 3, ml: 1 }}
+                    >
+                      Next
+                    </Button> 
+                  }
                 </Box>
               </React.Fragment>
-            )}
           </React.Fragment>
         </Paper>
         <Copyright />
