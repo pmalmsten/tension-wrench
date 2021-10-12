@@ -12,7 +12,7 @@ import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import AddressForm from './AddressForm';
+import Intro from './Intro'
 import PaymentForm from './PaymentForm';
 import Review from './Review';
 
@@ -29,12 +29,12 @@ function Copyright() {
   );
 }
 
-const steps = ['Shipping address', 'Payment details', 'Review your order'];
+const steps = ['Intro', 'Components', 'Data Flows', 'Discussion Guide'];
 
 function getStepContent(step: number) {
   switch (step) {
     case 0:
-      return <AddressForm />;
+      return <Intro />;
     case 1:
       return <PaymentForm />;
     case 2:
@@ -71,7 +71,7 @@ export default function Checkout() {
       >
         <Toolbar>
           <Typography variant="h6" color="inherit" noWrap>
-            Company name
+            Trenchcoat - Think Like a Hacker
           </Typography>
         </Toolbar>
       </AppBar>
