@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Intro from './Intro'
 import ComponentsEditor from './ComponentsEditor';
 import Review from './Review';
+import DataFlowsEditor from './DataFlowsEditor';
 
 function Copyright() {
   return (
@@ -35,7 +36,8 @@ const theme = createTheme();
 
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
-  const [components, setComponents] = React.useState<string[]>(["Test"]);
+  const [components, setComponents] = React.useState<string[]>([]);
+  const [dataFlows, setDataFlows] = React.useState(new Map<string, Set<string>>())
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -51,9 +53,48 @@ export default function Checkout() {
     setComponents(Array.from(updatedComponents.values()))
   };
 
+  const deepCopyDataFlowsMap = () => new Map(Array.from(dataFlows, ([key, value]: [string, Set<string>]): [string, Set<string>] => [key, new Set(value)]))
+
+  const deleteDataFlowsReferencingComponent = (removedComponent: string) => {
+    var copiedDataFlowsMap = deepCopyDataFlowsMap()
+    
+    if (copiedDataFlowsMap.has(removedComponent)) copiedDataFlowsMap.delete(removedComponent)
+    Array.from(copiedDataFlowsMap.values()).forEach(destComponents => {
+      destComponents.delete(removedComponent)
+    });
+
+    setDataFlows(copiedDataFlowsMap)
+  }
+
   const removeComponent = (removedComponent: string) => {
     setComponents(components.filter(c => c !== removedComponent))
+    deleteDataFlowsReferencingComponent(removedComponent)
   };
+
+  const dataFlowExists = (sourceComponent: string, destComponent: string) => 
+    dataFlows.get(sourceComponent)?.has(destComponent) || 
+    dataFlows.get(destComponent)?.has(sourceComponent)
+
+  const addDataFlow = (sourceComponent: string, destComponent: string) => {
+    if (dataFlowExists(sourceComponent, destComponent)) return;
+
+    var copiedMap = deepCopyDataFlowsMap()
+    if (!copiedMap.has(sourceComponent)) copiedMap.set(sourceComponent, new Set<string>())
+
+    copiedMap.get(sourceComponent)?.add(destComponent)
+
+    setDataFlows(copiedMap)
+  }
+
+  const removeDataFlow = (sourceComponent: string, destComponent: string) => {
+    if (!dataFlowExists(sourceComponent, destComponent)) return;
+
+    var copiedMap = deepCopyDataFlowsMap()
+    copiedMap.get(sourceComponent)?.delete(destComponent)
+    copiedMap.get(destComponent)?.delete(sourceComponent)
+
+    setDataFlows(copiedMap)
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -88,7 +129,12 @@ export default function Checkout() {
                   [
                     <Intro />,
                     <ComponentsEditor components={components} addComponent={addComponent} removeComponent={removeComponent} />,
-                    <Review />,
+                    <DataFlowsEditor 
+                      components={components}
+                      dataFlows={dataFlows}
+                      addFlow={addDataFlow}
+                      removeFlow={removeDataFlow}
+                    />,
                     <Review />
                   ][activeStep]
                 }
