@@ -23,7 +23,7 @@ export default function AddressForm() {
         you are building - this tool can't and won't tell you specifically how to secure
         it. This tool will help walk you and your team through a list of things to think
         about, but it's up to you to brainstorm and think critically about what risks your
-        project faces, and how to mitigate them. 
+        project faces and how to mitigate them. 
       </p>
     </React.Fragment>
   );
