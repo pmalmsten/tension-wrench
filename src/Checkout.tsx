@@ -13,7 +13,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Intro from './Intro'
-import PaymentForm from './PaymentForm';
+import ComponentsEditor from './ComponentsEditor';
 import Review from './Review';
 
 function Copyright() {
@@ -31,24 +31,11 @@ function Copyright() {
 
 const steps = ['Intro', 'Components', 'Data Flows', 'Discussion Guide'];
 
-function getStepContent(step: number) {
-  switch (step) {
-    case 0:
-      return <Intro />;
-    case 1:
-      return <PaymentForm />;
-    case 2:
-    case 3:
-      return <Review />;
-    default:
-      throw new Error('Unknown step');
-  }
-}
-
 const theme = createTheme();
 
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
+  const [components, setComponents] = React.useState<string[]>(["Test"]);
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -56,6 +43,16 @@ export default function Checkout() {
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
+  };
+
+  const addComponent = (component: string) => {
+    var updatedComponents = new Set(components)
+    updatedComponents.add(component)
+    setComponents(Array.from(updatedComponents.values()))
+  };
+
+  const removeComponent = (removedComponent: string) => {
+    setComponents(components.filter(c => c !== removedComponent))
   };
 
   return (
@@ -87,7 +84,14 @@ export default function Checkout() {
           </Stepper>
           <React.Fragment>
               <React.Fragment>
-                {getStepContent(activeStep)}
+                {
+                  [
+                    <Intro />,
+                    <ComponentsEditor components={components} addComponent={addComponent} removeComponent={removeComponent} />,
+                    <Review />,
+                    <Review />
+                  ][activeStep]
+                }
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                   {activeStep !== 0 && (
                     <Button onClick={handleBack} sx={{ mt: 3, ml: 1 }}>
