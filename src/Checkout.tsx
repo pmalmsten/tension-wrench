@@ -69,7 +69,7 @@ export default function Checkout() {
       >
         <Toolbar>
           <Typography variant="h6" color="inherit" noWrap>
-            Trenchcoat - Think Like a Hacker
+            Trenchcoat - Learn to Defend against Hackers
           </Typography>
         </Toolbar>
       </AppBar>
