@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import ProTip from './ProTip';
-import { Box, Button, Paper, Step, StepContent, StepLabel, Stepper } from '@mui/material';
+import { Box, Button, Paper, Step, StepButton, StepContent, StepLabel, Stepper } from '@mui/material';
 
 interface DiscussionGuideProps {
   components: string[],
@@ -23,14 +23,18 @@ function VerticalLinearStepper(props: StepperProps) {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  const handleStepClick = (stepIndex: number) => {
+    setActiveStep(stepIndex);
+  }
+
   return (
     <React.Fragment>
-      <Stepper activeStep={activeStep} orientation="vertical">
+      <Stepper nonLinear activeStep={activeStep} orientation="vertical">
         {props.steps.map((step, index) => (
           <Step key={step.label}>
-            <StepLabel>
+            <StepButton onClick={() => handleStepClick(index)}>
               {step.label}
-            </StepLabel>
+            </StepButton>
             <StepContent>
               <Typography>{step.description}</Typography>
               <Box sx={{ mb: 2 }}>
