@@ -16,11 +16,15 @@ function NewDataFlowForm(props: {
   componentChoices: string[], 
   handleSubmit: (sourceComponent: string, destComponent: string) => void 
 }) {
-  const [sourceComponent, setSourceComponent] = React.useState("")
-  const [destComponent, setDestComponent] = React.useState("")
+  const [sourceComponent, setSourceComponent] = React.useState<string | null>(null)
+  const [destComponent, setDestComponent] = React.useState<string | null>(null)
 
   const handleSubmit = (event: React.FormEvent) => {
-    props.handleSubmit(sourceComponent, destComponent)
+    if (sourceComponent != undefined && destComponent != undefined) {
+      props.handleSubmit(sourceComponent, destComponent)
+      setSourceComponent(null)
+      setDestComponent(null)
+    }
     event.preventDefault()
   }
 
@@ -29,20 +33,21 @@ function NewDataFlowForm(props: {
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Autocomplete
-              onChange={(event, value) => { if (value != undefined) { setSourceComponent(value)}}}
+              onChange={(event, value) => { setSourceComponent(value) }}
               value={sourceComponent}
               disablePortal
               options={props.componentChoices}
-              renderInput={(params) => <TextField {...params} label="Source Component" />}
+              renderInput={(params) => <TextField {...params} label="Source Component" required />}
             />
           </Grid>
           <Grid item xs={6}>
             <Autocomplete
-              onChange={(event, value) => { if (value != undefined) { setDestComponent(value)}}}
+              onChange={(event, value) => { setDestComponent(value) }}
+              disabled={sourceComponent == undefined}
               value={destComponent}
               disablePortal
               options={props.componentChoices}
-              renderInput={(params) => <TextField {...params} label="Destination Component" />}
+              renderInput={(params) => <TextField {...params} label="Destination Component" required />}
             />
           </Grid>
           <Grid item xs={6}>
