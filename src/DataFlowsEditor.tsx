@@ -12,7 +12,8 @@ interface DataFlowEditorProps {
   removeFlow: (sourceComponent: string, destComponent: string) => void
 }
 
-function NewDataFlowForm(props: { 
+function NewDataFlowForm(props: {
+  dataFlows: Map<string, Set<string>>,
   componentChoices: string[], 
   handleSubmit: (sourceComponent: string, destComponent: string) => void 
 }) {
@@ -27,6 +28,9 @@ function NewDataFlowForm(props: {
     }
     event.preventDefault()
   }
+
+  const dataFlowExists = (sourceComponent: string, destComponent: string) => props.dataFlows.get(sourceComponent)?.has(destComponent) ||
+    props.dataFlows.get(destComponent)?.has(sourceComponent)
 
   return <React.Fragment>
     <form onSubmit={handleSubmit}>
@@ -46,7 +50,9 @@ function NewDataFlowForm(props: {
               disabled={sourceComponent == undefined}
               value={destComponent}
               disablePortal
-              options={props.componentChoices.filter(choice => choice != sourceComponent)}
+              options={props.componentChoices
+                .filter(choice => choice != sourceComponent)
+                .filter(choice => sourceComponent == null || !dataFlowExists(sourceComponent, choice))}
               renderInput={(params) => <TextField {...params} label="Destination Component" required />}
             />
           </Grid>
@@ -89,7 +95,7 @@ export default function DataFlowsEditor(props: DataFlowEditorProps) {
           })
         })}
       </List>
-      <NewDataFlowForm componentChoices={props.components} handleSubmit={props.addFlow}/>
+      <NewDataFlowForm componentChoices={props.components} dataFlows={props.dataFlows} handleSubmit={props.addFlow}/>
     </React.Fragment>
   );
 }
