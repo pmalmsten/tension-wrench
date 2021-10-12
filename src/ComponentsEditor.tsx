@@ -12,10 +12,13 @@ interface ComponentsEditorProps {
 }
 
 function NewComponentForm(props: { handleSubmit: (newComponentName: string) => void }) {
-  const [currentComponentName, setCurrentComponentName] = React.useState("")
+  const [currentComponentName, setCurrentComponentName] = React.useState<string | undefined>(undefined)
 
   const handleSubmit = (event: React.FormEvent) => {
-    props.handleSubmit(currentComponentName)
+    if (currentComponentName != undefined) {
+      props.handleSubmit(currentComponentName)
+      setCurrentComponentName(undefined)
+    }
     event.preventDefault()
   }
 
@@ -24,7 +27,7 @@ function NewComponentForm(props: { handleSubmit: (newComponentName: string) => v
         <Grid container spacing={2}>
           <Grid item xs={8}>
             <TextField id="standard-basic" label="Component Name" variant="standard" required fullWidth 
-              value={currentComponentName} 
+              value={currentComponentName ?? ""}
               onChange={(event) => setCurrentComponentName(event.target.value)}/>
           </Grid>
           <Grid item xs={4}>
