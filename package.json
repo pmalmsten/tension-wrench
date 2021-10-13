@@ -14,6 +14,12 @@
     "react-scripts": "latest",
     "typescript": "latest"
   },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
