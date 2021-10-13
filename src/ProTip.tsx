@@ -16,7 +16,7 @@ function LightBulbIcon(props: SvgIconProps) {
 
 export default function ProTip(props: React.PropsWithChildren<ProTipProps>) {
   return (
-    <Typography sx={{ mt: 6, mb: 3 }} color="text.secondary">
+    <Typography sx={{ mt: 1, mb: 1 }} color="text.secondary">
       <LightBulbIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
       {props.children}
     </Typography>

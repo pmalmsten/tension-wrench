@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import ProTip from './ProTip';
 import { Box, Button, Step, StepButton, StepContent, Stepper } from '@mui/material';
 import { Trait } from './ComponentTraits';
+import GenerateSteps, { DiscussionGuideStep } from './DiscussionGuideSteps';
 
 interface DiscussionGuideProps {
   components: string[],
@@ -11,7 +12,7 @@ interface DiscussionGuideProps {
 }
 
 interface StepperProps {
-  steps: {label: string, description: string}[]
+  steps: DiscussionGuideStep[]
 }
 
 function VerticalLinearStepper(props: StepperProps) {
@@ -54,6 +55,12 @@ function VerticalLinearStepper(props: StepperProps) {
             </StepButton>
             <StepContent>
               <Typography>{step.description}</Typography>
+              {
+                step.suggestions.map(suggestionContent => 
+                <ProTip>
+                  {suggestionContent}
+                </ProTip>)
+              }
               <Box sx={{ mb: 2 }}>
                 <div>
                   { !isStepCompleted(index) ? 
@@ -108,60 +115,6 @@ function VerticalLinearStepper(props: StepperProps) {
   );
 }
 
-function generateSteps(components: string[], dataFlows: Map<string, Set<string>>): {label: string, description: string}[] {
-  var steps = components.flatMap(component => {
-    var componentSteps = [
-      {
-        label: `${component}: Tampering`,
-        description: "An attacker might try to tamper with this component."
-      },
-      {
-        label: `${component}: Repudiation`,
-        description: "An attacker might try to make an action and later claim they did not take that action, or take that action without having been discovered."
-      },
-      {
-        label: `${component}: Information Disclosure`,
-        description: "An attacker might try to extract data they should not have from this component."
-      },
-      {
-        label: `${component}: Denial of Service`,
-        description: "An attacker might try to cause this component to stop serving legitimate customers/users."
-      },
-      {
-        label: `${component}: Escalation of Privilege`,
-        description: "An attacker might try to take advantage of this component in order to gain access they should not have."
-      }
-    ]
-
-    var dataFlowSteps = Array.from(dataFlows.get(component)?.values() ?? []).flatMap(destComponent => [
-      {
-        label: `${component} <-> ${destComponent}: Spoofing of '${component}' identity`,
-        description: `An attacker might try to pretend to be '${component}' in order to gain access they should not have.`
-      },
-      {
-        label: `${component} <-> ${destComponent}: Spoofing of '${destComponent}' identity`,
-        description: `An attacker might try to pretend to be '${destComponent}' in order to gain access they should not have.`
-      },
-      {
-        label: `${component} <-> ${destComponent}: Tampering`,
-        description: `An attacker might try to alter information as it flows between these components (for example, as messages transit the public internet).`
-      },
-      {
-        label: `${component} <-> ${destComponent}: Information Disclosure`,
-        description: `An attacker might try to spy on information as it flows between these components (for example, as messages transit the public internet).`
-      },
-      {
-        label: `${component} <-> ${destComponent}: Denial of Service`,
-        description: `An attacker might try to disrupt the exchange of information between these components (for example, as messages transit the public internet).`
-      }
-    ])
-
-    return componentSteps.concat(dataFlowSteps)
-  })
-
-  return steps;
-}
-
 export default function DiscussionGuide(props: DiscussionGuideProps) {
   return (
     <React.Fragment>
@@ -178,7 +131,7 @@ export default function DiscussionGuide(props: DiscussionGuideProps) {
       <ProTip>
         The discussion guide below is based on STRIDE-per-element; see X for detais.
       </ProTip>
-      <VerticalLinearStepper steps={generateSteps(props.components, props.dataFlows)} />
+      <VerticalLinearStepper steps={GenerateSteps(props.components, props.componentTraitsMap, props.dataFlows)} />
       
     </React.Fragment>
   );
