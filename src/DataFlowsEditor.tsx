@@ -21,7 +21,7 @@ function NewDataFlowForm(props: {
   const [destComponent, setDestComponent] = React.useState<string | null>(null)
 
   const handleSubmit = (event: React.FormEvent) => {
-    if (sourceComponent != undefined && destComponent != undefined) {
+    if (sourceComponent !== null && destComponent !== null) {
       props.handleSubmit(sourceComponent, destComponent)
       setSourceComponent(null)
       setDestComponent(null)
@@ -47,11 +47,11 @@ function NewDataFlowForm(props: {
           <Grid item xs={6}>
             <Autocomplete
               onChange={(event, value) => { setDestComponent(value) }}
-              disabled={sourceComponent == undefined}
+              disabled={sourceComponent === undefined}
               value={destComponent}
               disablePortal
               options={props.componentChoices
-                .filter(choice => choice != sourceComponent)
+                .filter(choice => choice !== sourceComponent)
                 .filter(choice => sourceComponent == null || !dataFlowExists(sourceComponent, choice))}
               renderInput={(params) => <TextField {...params} label="Destination Component" required />}
             />

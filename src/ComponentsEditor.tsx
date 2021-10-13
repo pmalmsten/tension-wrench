@@ -20,7 +20,7 @@ function NewComponentForm(props: { handleSubmit: (newComponentName: string) => v
   const [currentComponentName, setCurrentComponentName] = React.useState<string | undefined>(undefined)
 
   const handleSubmit = (event: React.FormEvent) => {
-    if (currentComponentName != undefined) {
+    if (currentComponentName !== undefined) {
       props.handleSubmit(currentComponentName)
       setCurrentComponentName(undefined)
     }
