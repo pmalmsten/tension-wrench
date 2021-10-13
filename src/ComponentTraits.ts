@@ -7,15 +7,15 @@ export interface Trait {
 export const Traits = {
     OutOfScope: {
         name: 'Out of Scope',
-        description: 'My system interacts with this component, but we are not responsible for securing it.'
+        description: 'Our system interacts with this component, but we are not responsible for securing it.'
     },
     AzureResource: {
         name: 'Azure Resource',
-        description: 'This component either is an Azure Resource (e.g. a CosmosDB database) or is built on one (e.g. App Service).'
+        description: 'This component is an Azure Resource itself (e.g. a CosmosDB database) or is built on one (e.g. an API built on App Service).'
     },
     MyCodeRunsHere: {
         name: 'My Code Runs Here',
-        description: 'Code we wrote runs on this resource.'
+        description: 'Code you or your team wrote runs on this resource.'
     }
 };
 
