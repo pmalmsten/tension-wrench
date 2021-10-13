@@ -14,9 +14,9 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Intro from './Intro'
 import ComponentsEditor from './ComponentsEditor';
-import Review from './Review';
 import DataFlowsEditor from './DataFlowsEditor';
 import DiscussionGuide from './DiscussionGuide';
+import { Trait } from './ComponentTraits';
 
 function Copyright() {
   return (
@@ -38,6 +38,7 @@ const theme = createTheme();
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [components, setComponents] = React.useState<string[]>([]);
+  const [componentTraitsMap, setComponentTraitsMap] = React.useState(new Map<string, Trait[]>())
   const [dataFlows, setDataFlows] = React.useState(new Map<string, Set<string>>())
 
   const handleNext = () => {
@@ -48,13 +49,27 @@ export default function Checkout() {
     setActiveStep(activeStep - 1);
   };
 
+  const setComponentTraits = (component: string, selectedTraits: Trait[] | undefined) => {
+    var updatedComponentTraitsMap = new Map(Array.from(componentTraitsMap, ([key, value]: [string, Trait[]]) => [key, Array.from(value)]))
+
+    if (selectedTraits !== undefined) {
+      updatedComponentTraitsMap.set(component, selectedTraits)
+    } else {
+      updatedComponentTraitsMap.delete(component)
+    }
+
+    setComponentTraitsMap(updatedComponentTraitsMap)
+  }
+
   const addComponent = (component: string) => {
     var updatedComponents = new Set(components)
     updatedComponents.add(component)
+
     setComponents(Array.from(updatedComponents.values()))
+    setComponentTraits(component, [])
   };
 
-  const deepCopyDataFlowsMap = () => new Map(Array.from(dataFlows, ([key, value]: [string, Set<string>]): [string, Set<string>] => [key, new Set(value)]))
+  const deepCopyDataFlowsMap = () => new Map(Array.from(dataFlows, ([key, value]: [string, Set<string>]) => [key, new Set(value)]))
 
   const deleteDataFlowsReferencingComponent = (removedComponent: string) => {
     var copiedDataFlowsMap = deepCopyDataFlowsMap()
@@ -70,6 +85,7 @@ export default function Checkout() {
   const removeComponent = (removedComponent: string) => {
     setComponents(components.filter(c => c !== removedComponent))
     deleteDataFlowsReferencingComponent(removedComponent)
+    setComponentTraits(removedComponent, undefined)
   };
 
   const dataFlowExists = (sourceComponent: string, destComponent: string) => 
@@ -129,14 +145,14 @@ export default function Checkout() {
                 {
                   [
                     <Intro />,
-                    <ComponentsEditor components={components} addComponent={addComponent} removeComponent={removeComponent} />,
+                    <ComponentsEditor components={components} componentTraitsMap={componentTraitsMap} addComponent={addComponent} removeComponent={removeComponent} setComponentTraits={setComponentTraits} />,
                     <DataFlowsEditor 
                       components={components}
                       dataFlows={dataFlows}
                       addFlow={addDataFlow}
                       removeFlow={removeDataFlow}
                     />,
-                    <DiscussionGuide components={components} dataFlows={dataFlows} />
+                    <DiscussionGuide components={components} componentTraitsMap={componentTraitsMap} dataFlows={dataFlows} />
                   ][activeStep]
                 }
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>

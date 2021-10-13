@@ -1,10 +1,12 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import ProTip from './ProTip';
-import { Box, Button, Paper, Step, StepButton, StepContent, Stepper } from '@mui/material';
+import { Box, Button, Step, StepButton, StepContent, Stepper } from '@mui/material';
+import { Trait } from './ComponentTraits';
 
 interface DiscussionGuideProps {
   components: string[],
+  componentTraitsMap: Map<string, Trait[]>,
   dataFlows: Map<string, Set<string>>
 }
 
