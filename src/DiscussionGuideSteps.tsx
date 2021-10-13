@@ -1,10 +1,11 @@
+import { Typography } from "@mui/material";
 import React from "react";
 import { Trait, Traits } from "./ComponentTraits";
+import ProTip from "./ProTip";
 
 export interface DiscussionGuideStep {
     label: string,
-    description: string,
-    suggestions: JSX.Element[]
+    content: JSX.Element
 }
 
 export default function generateSteps(components: string[], componentTraitsMap: Map<string, Trait[]>, dataFlows: Map<string, Set<string>>): DiscussionGuideStep[] {
@@ -14,41 +15,37 @@ export default function generateSteps(components: string[], componentTraitsMap: 
         var componentSteps: DiscussionGuideStep[] = componentTraitNamesSet.has(Traits.OutOfScope.name) ? [] : [
             {
                 label: `${component}: Tampering`,
-                description: "An attacker might try to tamper with this component.",
-                suggestions: [
-                    <React.Fragment>
+                content: <React.Fragment>
+                    <Typography>An attacker might try to tamper with this component.</Typography>
+                    <ProTip>
                         Consider using an access control mechanism to restrict acess to this resource. Some examples include operating system user
                         permissions, network access control lists, or cloud provider access mangement tools. Only grant access to users and systems
                         that need access, and grant as little access as possible.
-                    </React.Fragment>,
-                    componentTraitNamesSet.has(Traits.AzureResource.name) ? <React.Fragment>
+                    </ProTip>
+                    {componentTraitNamesSet.has(Traits.AzureResource.name) && <ProTip>
                         You indicated that this is an Azure resource - Azure RBAC allows one to configure fine-grained control over which users or systems
                         have the ability to administer Azure resources - 
                         consider granting the narrowest possible roles to the users and systems that need to manage this resource. In addition, some Azure 
                         resources offer additional tools for restricting access, such as VNet support, data plane role-based access control (such as for Cosmos DB), 
                         or IP address filtering.
-                    </React.Fragment> : undefined
-                ].flatMap(x => x ?? [])
+                    </ProTip>}
+                </React.Fragment>
             },
             {
                 label: `${component}: Repudiation`,
-                description: "An attacker might try to make an action and later claim they did not take that action, or take that action without having been discovered.",
-                suggestions: []
+                content: <Typography>An attacker might try to make an action and later claim they did not take that action, or take that action without having been discovered.</Typography>,
             },
             {
                 label: `${component}: Information Disclosure`,
-                description: "An attacker might try to extract data they should not have from this component.",
-                suggestions: []
+                content: <Typography>An attacker might try to extract data they should not have from this component.</Typography>,
             },
             {
                 label: `${component}: Denial of Service`,
-                description: "An attacker might try to cause this component to stop serving legitimate customers/users.",
-                suggestions: []
+                content: <Typography>An attacker might try to cause this component to stop serving legitimate customers/users.</Typography>,
             },
             {
                 label: `${component}: Escalation of Privilege`,
-                description: "An attacker might try to take advantage of this component in order to gain access they should not have.",
-                suggestions: []
+                content: <Typography>An attacker might try to take advantage of this component in order to gain access they should not have.</Typography>,
             }
         ];
 
@@ -57,28 +54,23 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             .flatMap(destComponent => [
                 {
                     label: `${component} <-> ${destComponent}: Spoofing of '${component}' identity`,
-                    description: `An attacker might try to pretend to be '${component}' in order to gain access they should not have.`,
-                    suggestions: []
+                    content: <Typography>An attacker might try to pretend to be '{component}' in order to gain access they should not have.</Typography>,
                 },
                 {
                     label: `${component} <-> ${destComponent}: Spoofing of '${destComponent}' identity`,
-                    description: `An attacker might try to pretend to be '${destComponent}' in order to gain access they should not have.`,
-                    suggestions: []
+                    content: <Typography>An attacker might try to pretend to be '${destComponent}' in order to gain access they should not have.</Typography>,
                 },
                 {
                     label: `${component} <-> ${destComponent}: Tampering`,
-                    description: `An attacker might try to alter information as it flows between these components (for example, as messages transit the public internet).`,
-                    suggestions: []
+                    content: <Typography>An attacker might try to alter information as it flows between these components (for example, as messages transit the public internet).</Typography>,
                 },
                 {
                     label: `${component} <-> ${destComponent}: Information Disclosure`,
-                    description: `An attacker might try to spy on information as it flows between these components (for example, as messages transit the public internet).`,
-                    suggestions: []
+                    content: <Typography>An attacker might try to spy on information as it flows between these components (for example, as messages transit the public internet).</Typography>,
                 },
                 {
                     label: `${component} <-> ${destComponent}: Denial of Service`,
-                    description: `An attacker might try to disrupt the exchange of information between these components (for example, as messages transit the public internet).`,
-                    suggestions: []
+                    content: <Typography>An attacker might try to disrupt the exchange of information between these components (for example, as messages transit the public internet).</Typography>,
                 }
             ])
 

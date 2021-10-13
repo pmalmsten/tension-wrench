@@ -54,13 +54,7 @@ function VerticalLinearStepper(props: StepperProps) {
               {step.label}
             </StepButton>
             <StepContent>
-              <Typography>{step.description}</Typography>
-              {
-                step.suggestions.map(suggestionContent => 
-                <ProTip>
-                  {suggestionContent}
-                </ProTip>)
-              }
+              {step.content}
               <Box sx={{ mb: 2 }}>
                 <div>
                   { !isStepCompleted(index) ? 
