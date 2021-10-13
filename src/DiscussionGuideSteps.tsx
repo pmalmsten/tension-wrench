@@ -16,7 +16,13 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             {
                 label: `${component}: Tampering`,
                 content: <React.Fragment>
-                    <Typography>An attacker might try to tamper with this component.</Typography>
+                    <Typography>An attacker might try to tamper with this component in order to accomplish their goals.</Typography>
+                    <p><Typography>Examples include:</Typography>
+                    <ul>
+                        <li>An attacker might try to alter data in their database (e.g. to increase an account balance).</li>
+                        <li>An attacker might try to reconfigure a load balancer in order to point route requests to a system under their control.</li>
+                        <li>An attacker might try to delete or destroy a resource in order to take a system offline.</li>
+                    </ul></p> 
                     <ProTip>
                         Consider using an access control mechanism to restrict acess to this resource. Some examples include operating system user
                         permissions, network access control lists, or cloud provider access mangement tools. Only grant access to users and systems
