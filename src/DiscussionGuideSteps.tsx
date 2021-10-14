@@ -39,7 +39,31 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             },
             {
                 label: `${component}: Repudiation`,
-                content: <Typography>An attacker might try to make an action and later claim they did not take that action, or take that action without having been discovered.</Typography>,
+                content: <React.Fragment>
+                    <Typography>An attacker might try to make an action and later claim they did not take that action, or take that action without having been discovered.</Typography>
+                    <p><Typography>Examples include:</Typography>
+                    <ul>
+                        <li>An attacker might try to spend a gift card more than once.</li>
+                        <li>An attacker might try to exploit a system without leaving any traces behind.</li>
+                    </ul></p>
+                    <ProTip>
+                        Consider setting up a logging mechanism for this component, such that you can understand what transpired after the fact. There are a couple types of
+                        logs that can be useful:
+                        <ul>
+                            <li>Application Logs. Typically unstructured logs that print diagnostic information about errors, warnings, or trace messages emitted while your application
+                                is running.
+                            </li>
+                            <li>Request Logs. Typically a structured format that is more condensed than application logs, request logs typically record metadata about particular
+                                requests your application received, and what happened - these might include the IP address of the sender, the HTTP response code that the server
+                                responded with, how long the request took, etc.
+                            </li>
+                        </ul>
+                    </ProTip>
+                    {componentTraitNamesSet.has(Traits.AzureResource.name) && <ProTip>
+                        You indicated that this is an Azure resource - many Azure resources offer <a href="https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/platform-logs-overview">
+                        built-in support for collecting diagostic logs.</a> Consider enabling diagostic logging for this resource. 
+                    </ProTip>}
+                </React.Fragment>,
             },
             {
                 label: `${component}: Information Disclosure`,
