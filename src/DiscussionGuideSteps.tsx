@@ -150,7 +150,41 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             },
             {
                 label: `${component}: Escalation of Privilege`,
-                content: <Typography>An attacker might try to take advantage of this component in order to gain access they should not have.</Typography>,
+                content: <Typography>
+                    An attacker might try to take advantage of this component in order to gain access they should not have.
+                    <p>Examples include:
+                    <ul>
+                        <li>An attacker might try to trick this component into taking actions that it shouldn't (for example, an attacker might include SQL commands in API inputs
+                            hoping that this component sends those commands to a database improperly).
+                        </li>
+                        <li>An attacker might try to exploit vulnerabilities in process running as an administrator/root in order to gain administrator access to a system.</li>
+                        <li>After gaining access to a system, an attacker might try to find credentials stored on the system that grant the attacker more access (either access
+                            to more systems they could not access before, or higher privilege access to systems the attacker could already access).
+                        </li>
+                    </ul></p>
+                    <ProTip>
+                        Common ways to mitigate escalation of privilege attacks include:
+                        <ul>
+                            <li>Taking care to keep commands separate from data, particularly for databases. For SQL, a great way to do this is through parameterized queries (
+                                aka. prepared statements).
+                            </li>
+                            <li>Validate inputs carefully before acting on them.</li>
+                            <li>When this component calls another component on behalf of a client, indicate to the downstream system who the call is being made on behalf of; this allows
+                                the downstream system to determine whether the originator of the request is authorized (in addition to checking that this component is allowed to)
+                                make the call. For more specific examples, see 
+                                <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow">Microsoft Identity Platform</a> on-behalf-of flow and 
+                                the <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html">AWS IAM external ID</a> field.
+                            </li>
+                            <li>Run this component with the least privilege necessary for it to function. For processes on a host, run as non-administrative system user having minimal
+                                privileges; for cloud services, use roles granting as few permissions as possible.
+                            </li>
+                        </ul>
+                    </ProTip>
+                    {componentTraitNamesSet.has(Traits.AzureResource.name) && <ProTip>
+                        You indicated that this is an Azure resource - as an example of how to keep commands separate from data, if this component accesses Cosmos DB using the SQL API, consider 
+                        using <a href="https://docs.microsoft.com/en-us/azure/cosmos-db/sql/sql-query-parameterized-queries">CosmosDB parameterized queries.</a>
+                    </ProTip>}
+                </Typography>,
             }
         ];
 
