@@ -1,6 +1,7 @@
 import * as React from 'react';
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
+import { Paper } from '@mui/material';
 
 interface ProTipProps {
 }
@@ -15,9 +16,15 @@ function LightBulbIcon(props: SvgIconProps) {
 
 export default function ProTip(props: React.PropsWithChildren<ProTipProps>) {
   return (
-    <Typography sx={{ mt: 1, mb: 1 }} color="text.secondary">
-      <LightBulbIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-      {props.children}
-    </Typography>
+    <Paper variant="outlined" sx={{
+      mb: 1,
+      p: 0.5,
+      px: 1.5
+    }}>
+      <Typography sx={{ mt: 1, mb: 1 }} color="text.secondary">
+        <LightBulbIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+        {props.children}
+      </Typography>
+    </Paper>
   );
 }
