@@ -110,7 +110,43 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             },
             {
                 label: `${component}: Denial of Service`,
-                content: <Typography>An attacker might try to cause this component to stop serving legitimate customers/users.</Typography>,
+                content: <Typography>
+                    An attacker might try to cause this component to stop serving legitimate customers/users.
+                    <p>Examples include:
+                    <ul>
+                        <li>An attacker (or even an overzelous legitimate user) might try to flood this component with more requests or network traffic than it can handle.</li>
+                        <li>An attacker might try to exhaust resources provided by this component. They might:
+                            <ul>
+                                <li>Send requests that are very large, to consume RAM.</li>
+                                <li>Send requests to your API that causes your services to download very large files (e.g. if your API takes a URL as input) to exhaust disk space.</li>
+                                <li>Consume available CPU by mining for bitcoin (if your component runs code provided by users, e.g. like CI/CD tools such as Github Actions).</li>
+                            </ul>
+                        </li>
+                    </ul></p>
+                    <ProTip>
+                        Consider limiting how many resources any given user of this component may consume. Some options to consider include:
+                        <ul>
+                            <li>Limiting how large requests to this component may be, in terms of total size (bytes), number of items (for APIs accepting lists of items), or both.</li>
+                            <li>Limiting how often a given user is allowed to invoke your API and returning throttling errors (e.g. HTTP 429) when the limit is exceeded.</li>
+                            <li>Use a DDoS protection service provider in front of this component in order to defend against excessive network traffic.</li>
+                        </ul>
+                    </ProTip>
+                    {componentTraitNamesSet.has(Traits.AzureResource.name) && <ProTip>
+                        You indicated that this is an Azure resource - Azure offers a varity of tools to help defend against denial of service attacks, including:
+                        <ul>
+                            <li><a href="https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts">Azure API Management</a> provides 
+                                configurable rules for limiting how often a given subscriber may call an API.
+                            </li>
+                            <li>Azure Front Door provides a <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-ddos">variety of DDoS protections built-in</a> that
+                                can help stop floods of illegtimate network traffic before they arrive at your system.
+                                <ul>
+                                    <li><a href="https://docs.microsoft.com/en-us/azure/web-application-firewall/overview">Azure Web Application Firewall</a> (which can integrate 
+                                    with Azure Front Door) also offers rules for rate limiting requests by client IP address.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </ProTip>}
+                </Typography>,
             },
             {
                 label: `${component}: Escalation of Privilege`,
