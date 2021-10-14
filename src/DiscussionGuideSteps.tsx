@@ -15,9 +15,9 @@ export default function generateSteps(components: string[], componentTraitsMap: 
         var componentSteps: DiscussionGuideStep[] = componentTraitNamesSet.has(Traits.OutOfScope.name) ? [] : [
             {
                 label: `${component}: Tampering`,
-                content: <React.Fragment>
-                    <Typography>An attacker might try to tamper with this component in order to accomplish their goals.</Typography>
-                    <p><Typography>Examples include:</Typography>
+                content: <Typography>
+                    An attacker might try to tamper with this component in order to accomplish their goals.
+                    <p>Examples include:
                     <ul>
                         <li>An attacker might try to alter data in their database (e.g. to increase an account balance).</li>
                         <li>An attacker might try to reconfigure a load balancer in order to point route requests to a system under their control.</li>
@@ -35,13 +35,13 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                         resources offer additional tools for restricting access, such as VNet support, data plane role-based access control (such as for Cosmos DB), 
                         or IP address filtering.
                     </ProTip>}
-                </React.Fragment>
+                </Typography>
             },
             {
                 label: `${component}: Repudiation`,
-                content: <React.Fragment>
-                    <Typography>An attacker might try to make an action and later claim they did not take that action, or take that action without having been discovered.</Typography>
-                    <p><Typography>Examples include:</Typography>
+                content: <Typography>
+                    An attacker might try to make an action and later claim they did not take that action, or take that action without having been discovered.
+                    <p>Examples include:
                     <ul>
                         <li>An attacker might try to spend a gift card more than once.</li>
                         <li>An attacker might try to exploit a system without leaving any traces behind.</li>
@@ -63,7 +63,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                         You indicated that this is an Azure resource - many Azure resources offer <a href="https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/platform-logs-overview">
                         built-in support for collecting diagostic logs.</a> Consider enabling diagostic logging for this resource. 
                     </ProTip>}
-                </React.Fragment>,
+                </Typography>,
             },
             {
                 label: `${component}: Information Disclosure`,
