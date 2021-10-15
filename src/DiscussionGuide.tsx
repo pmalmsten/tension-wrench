@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import ProTip from './ProTip';
 import { Box, Button, Step, StepButton, StepContent, Stepper } from '@mui/material';
 import { Trait } from './ComponentTraits';
 import GenerateSteps, { DiscussionGuideStep } from './DiscussionGuideSteps';
@@ -120,11 +119,8 @@ export default function DiscussionGuide(props: DiscussionGuideProps) {
         actions attackers might try in order to break in to your system. Grab some
         teammates and think about the following possiblities. Remember, this is
         brainstorming - all ideas are fair game, even if you later decide a possible 
-        attack is too unlikely to do anything about.
+        attack is too unlikely or too low impact to do anything about.
       </p>
-      <ProTip>
-        The discussion guide below is based on STRIDE-per-element; see X for detais.
-      </ProTip>
       <VerticalLinearStepper steps={GenerateSteps(props.components, props.componentTraitsMap, props.dataFlows)} />
       
     </React.Fragment>
