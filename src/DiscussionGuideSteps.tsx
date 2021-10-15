@@ -287,7 +287,35 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                 },
                 {
                     label: `${component} <-> ${destComponent}: Information Disclosure`,
-                    content: <Typography>An attacker might try to spy on information as it flows between these components (for example, as messages transit the public internet).</Typography>,
+                    content: <Typography>
+                        An attacker might try to spy on information as it flows between these components (for example, as messages transit the public internet).
+                        <p>For example:
+                            <ul>
+                                <li>An attacker might try to read the contents of network packets flowing through a router that they previously compromised.</li>
+                                <li>An attacker might try to read the contents of environment variables passed from one process to another.</li>
+                                <li>An attacker might try to read the contents data sent over a pipe from one process to another.</li>
+                                <li>An attacker might try to attach a bus sniffer to a hardware bus connecting multiple integrated circuits on a circuit board to extract 
+                                    confidential keys or secrets sent between them.</li>
+                            </ul>
+                        </p>
+                        <ProTip>
+                            Consider having {component} and {destComponent} protect the contents of messages exchanged between them using a security control that provides
+                            confidentiality (e.g. encryption). For example:
+                            <ul>
+                                <li>When using TCP, TLS provides confidentiality through encryption. See 
+                                    <a href="https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html">OWASP's Transport Layer Protection cheat sheet</a> for specific
+                                    guidance.
+                                </li>
+                                <li>When using UDP, dTLS provides confidentiality through encryption similar to that of TLS.</li>
+                            </ul>
+                        </ProTip>
+                        <Warning>
+                            When establishing encryption keys with a remote system, be mindful of how certain you are that you established an encrypted connection with
+                            a system that you trust. For example, even when using TLS to encrypt messages sent over a network, if the remote system is not properly authenticated first by verifying the
+                            certificate they present, then an attacker can simply spoof the identity of the remote system in order to trick the client into sharing encryption keys with
+                            them.
+                        </Warning>
+                    </Typography>,
                 },
                 {
                     label: `${component} <-> ${destComponent}: Denial of Service`,
