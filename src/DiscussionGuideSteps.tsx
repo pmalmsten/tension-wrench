@@ -319,7 +319,27 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                 },
                 {
                     label: `${component} <-> ${destComponent}: Denial of Service`,
-                    content: <Typography>An attacker might try to disrupt the exchange of information between these components (for example, as messages transit the public internet).</Typography>,
+                    content: <Typography>
+                        An attacker might try to disrupt the exchange of information between these components (for example, as messages transit the public internet).
+                        <p>For example:
+                            <ul>
+                                <li>An attacker might try to send large volumes of data over a network in order to delay legitimate messages from getting through.</li>
+                                <li>An attacker (or even someone making a mistake) might try to disconnect a network route between two components in order to prevent them from
+                                    exchanging information.
+                                </li>
+                            </ul>
+                        </p>
+                        <ProTip>
+                            Typical strategies for defending against excessive network traffic saturating a data link include placing high capacity traffic filters in front 
+                            of finite capacity data links in order to drop illegtimate packets before they consume capacity of the backbone link. DDoS protection services (such as Microsft, CloudFlare, AWS, etc.)
+                            typically place many such traffic filters around the globe and use DNS to route clients to the nearest one in order to defend their networks.
+
+                            <p>Consider what would happen in the event of an accidental network disruption between these components - would these components be able to fail over
+                                to a separate redundant network link? Would these components be able to fail over to separate redundant instances (e.g. database failover)? Is your
+                                application designed such that network errors would be detected and traffic shifted to healthy instances (e.g. within a data center via a
+                                load balancer, or cross-region via a global router like DNS)?</p>
+                        </ProTip>
+                    </Typography>,
                 }
             ])
 
