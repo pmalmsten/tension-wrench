@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
+import Info from './Info';
 
 export default function Intro() {
   return (
@@ -21,6 +22,11 @@ export default function Intro() {
         about, but it's up to you to brainstorm and think critically about what risks your
         project faces and how to mitigate them. 
       </p>
+      <Info>
+        Note: This tool does not save any data - it is intended as a teaching tool for showing
+        how to brainstorm software security threats. While using this website, make sure to separately 
+        write down any information you would like to save for later.
+      </Info>
     </React.Fragment>
   );
 }
