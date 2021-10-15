@@ -2,6 +2,7 @@ import { Typography } from "@mui/material";
 import React from "react";
 import { Trait, Traits } from "./ComponentTraits";
 import ProTip from "./ProTip";
+import Warning from "./Warning";
 
 export interface DiscussionGuideStep {
     label: string,
@@ -247,7 +248,42 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                 },
                 {
                     label: `${component} <-> ${destComponent}: Tampering`,
-                    content: <Typography>An attacker might try to alter information as it flows between these components (for example, as messages transit the public internet).</Typography>,
+                    content: <Typography>
+                        An attacker might try to alter information as it flows between these components (for example, as messages transit the public internet).
+                        <p>Examples include:
+                            <ul>
+                                <li>An attacker might try to alter the content of a web site as it flows over a network in order to censor speech.</li>
+                                <li>An attacker might try to alter the content of a web site as it flows over a network in order to insert malware (like a bitcoin miner).</li>
+                                <li>An attacker might try to alter the content of a library binary as it flows over a network in order to insert malware (like a reverse shell).</li>
+                            </ul>
+                        </p>
+                        <ProTip>
+                            Consider having {component} and {destComponent} use a security control that assures the integrity of messages that they exchange such that
+                            any attempt at tampering may be detected. Examples include:
+                            <ul>
+                                <li>For TCP connections, TLS is a good way to protect the integrity &amp; authenticity of messages that are exchanged</li>
+                                <li>For UDP messages, dTLS is a good way to integrity &amp; authenticity of messages that are exchanged in a similar manner as TLS.</li>
+                                <li>
+                                    If these components exchange messages outside of a server/client relationship (e.g. via a message broker, or a 
+                                    non-TCP channel), consider having both components require messages to be signed with a&nbsp;
+                                    <a href="https://en.wikipedia.org/wiki/Message_authentication_code">message authentication code</a> or&nbsp;
+                                    <a href="https://en.wikipedia.org/wiki/Digital_signature">digital signature</a>.
+                                </li>
+                            </ul>
+                        </ProTip>
+                        <Warning>
+                            When checking the integrity of messages exchanged over an untrusted channel, make sure that the expected digest value either comes from a trusted source 
+                            over a separate trusted channel or is authenticated using a strong authentication mechanism. 
+                            
+                            <p>
+                                For example, if a message and a SHA256 digest of the message's content were sent together over an untrusted channel, and attacker could easily 
+                                recompute the correct SHA256 to send alongside an altered copy of a message, and the receiver would not be able to detect that the message was altered.
+                                Much better approaches would be to attach a <a href="https://en.wikipedia.org/wiki/Message_authentication_code">message authentication code</a> or&nbsp;
+                                <a href="https://en.wikipedia.org/wiki/Digital_signature">digital signature</a> to the message instead (either of which are much more difficult
+                                for an attacker to forge), or to send the expected SHA256 digest over a separate, trusted channel (e.g. over a separate connection protected with TLS).
+                            </p>
+                        </Warning>
+                    </Typography>,
                 },
                 {
                     label: `${component} <-> ${destComponent}: Information Disclosure`,
