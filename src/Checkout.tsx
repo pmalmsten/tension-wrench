@@ -11,19 +11,20 @@ import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import theme from './theme';
 import Intro from './Intro'
 import ComponentsEditor from './ComponentsEditor';
 import DataFlowsEditor from './DataFlowsEditor';
 import DiscussionGuide from './DiscussionGuide';
 import { Trait } from './ComponentTraits';
+import { ThemeProvider } from '@mui/system';
 
 function Copyright() {
   return (
     <Typography variant="body2" color="text.secondary" align="center">
       {'Copyright © '}
       <Link color="inherit" href="https://material-ui.com/">
-        Your Website
+        Microsoft
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -32,8 +33,6 @@ function Copyright() {
 }
 
 const steps = ['Intro', 'Components', 'Data Flows', 'Discussion Guide'];
-
-const theme = createTheme();
 
 export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
