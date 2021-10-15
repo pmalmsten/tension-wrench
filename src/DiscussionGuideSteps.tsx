@@ -8,9 +8,13 @@ export interface DiscussionGuideStep {
     content: JSX.Element
 }
 
+function getNamesOfTraitsPresentForComponent(componentTraitsMap: Map<string, Trait[]>, component: string): Set<string> {
+    return new Set(Array.from(componentTraitsMap.get(component) ?? [], (value: Trait, k: number) => value.name))
+}
+
 export default function generateSteps(components: string[], componentTraitsMap: Map<string, Trait[]>, dataFlows: Map<string, Set<string>>): DiscussionGuideStep[] {
     var steps = components.flatMap(component => {
-        var componentTraitNamesSet = new Set(Array.from(componentTraitsMap.get(component) ?? [], (value: Trait, k: number) => value.name))
+        var componentTraitNamesSet = getNamesOfTraitsPresentForComponent(componentTraitsMap, component)
 
         var componentSteps: DiscussionGuideStep[] = componentTraitNamesSet.has(Traits.OutOfScope.name) ? [] : [
             {
@@ -188,16 +192,58 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             }
         ];
 
+        const createSpoofingStepContent = (spoofedComponent: string, checkingComponent: string) => {
+            return <Typography>
+                An attacker might try to pretend to be '{spoofedComponent}' in order to gain access they should not have.
+                <p>Examples include:
+                <ul>
+                    <li>An attacker might try to make API calls while saying they are someome they are not (e.g. by spoofing their IP address).</li>
+                    <li>An attacker might try to hijack a DNS name such that it points to a system under the attackers' control.</li>
+                </ul>
+                </p>
+                <ProTip>
+                    Consider having {checkingComponent} require that {spoofedComponent} prove its identity using a strong identification mechanism
+                    that is difficult to forge. For example:
+                    <ul>
+                        <li>If {spoofedComponent} acts as a server which {checkingComponent} connects to, consider having {checkingComponent} require that
+                            the connection be over TLS, and require that the server properly proves its identity.</li>
+                        <li>
+                            If {spoofedComponent} acts as a client which connects to {checkingComponent}, consider having {checkingComponent} require that
+                            {spoofedComponent} prove that it knows a secret having enough entropy that it would be impractical for an attacker to guess (e.g.
+                            an access token sent over TLS or a TLS client certificate).
+                        </li>
+                        <li>
+                            If {spoofedComponent} and {checkingComponent} exchange messages outside of a server/client relationship (e.g. via a message broker, or a 
+                            non-TCP channel), consider having both components require messages to be signed with a&nbsp;
+                            <a href="https://en.wikipedia.org/wiki/Message_authentication_code">message authentication code</a> or&nbsp;
+                            <a href="https://en.wikipedia.org/wiki/Digital_signature">digital signature</a>.
+                        </li>
+                    </ul>
+                </ProTip>
+                {(getNamesOfTraitsPresentForComponent(componentTraitsMap, checkingComponent).has(Traits.AzureResource.name) ||
+                    getNamesOfTraitsPresentForComponent(componentTraitsMap, spoofedComponent).has(Traits.AzureResource.name)) && <ProTip>
+                    You indicated that at least one of these components is an Azure resource - when acting as server, some Azure services offer the ability to manage TLS certificates 
+                    for your custom domains (and their corresponding private keys) for you automatically, such as&nbsp;
+                    <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-certificate#create-a-free-managed-certificate">App Service</a> and&nbsp;
+                    <a href="https://docs.microsoft.com/en-us/azure/frontdoor/standard-premium/how-to-configure-https-custom-domain#azure-managed-certificates">Front Door</a>.
+
+                    <p>When acting as a client, many Azure services make it easy for your code to authenticate to other Azure resources by providing&nbsp;
+                    <a href="https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview">managed identity
+                    credentials</a> to your code.</p>
+                </ProTip>}
+            </Typography>
+        }
+
         var dataFlowSteps: DiscussionGuideStep[] = Array
             .from(dataFlows.get(component)?.values() ?? [])
             .flatMap(destComponent => [
                 {
                     label: `${component} <-> ${destComponent}: Spoofing of '${component}' identity`,
-                    content: <Typography>An attacker might try to pretend to be '{component}' in order to gain access they should not have.</Typography>,
+                    content: createSpoofingStepContent(component, destComponent)
                 },
                 {
                     label: `${component} <-> ${destComponent}: Spoofing of '${destComponent}' identity`,
-                    content: <Typography>An attacker might try to pretend to be '${destComponent}' in order to gain access they should not have.</Typography>,
+                    content: createSpoofingStepContent(destComponent, component),
                 },
                 {
                     label: `${component} <-> ${destComponent}: Tampering`,
