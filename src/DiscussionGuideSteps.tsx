@@ -194,6 +194,15 @@ export default function generateSteps(components: string[], componentTraitsMap: 
         ];
 
         const createSpoofingStepContent = (spoofedComponent: string, checkingComponent: string) => {
+            const spoofedComponentTraitNames = getNamesOfTraitsPresentForComponent(componentTraitsMap, spoofedComponent)
+            const checkingComponentTraitNames = getNamesOfTraitsPresentForComponent(componentTraitsMap, checkingComponent)
+
+            const spoofedComponentActsAsClient = spoofedComponentTraitNames.has(Traits.ActsAsAClient.name)
+            const spoofedComponentActsAsServer = spoofedComponentTraitNames.has(Traits.ActsAsAServer.name)
+
+            const checkingComponentActAsClient = checkingComponentTraitNames.has(Traits.ActsAsAClient.name)
+            const checkingComponentActsAsServer = checkingComponentTraitNames.has(Traits.ActsAsAServer.name)
+
             return <Typography>
                 An attacker might try to pretend to be '{spoofedComponent}' in order to gain access they should not have.
                 <p>Examples include:
@@ -206,13 +215,20 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                     Consider having {checkingComponent} require that {spoofedComponent} prove its identity using a strong identification mechanism
                     that is difficult to forge. For example:
                     <ul>
-                        <li>If {spoofedComponent} acts as a server which {checkingComponent} connects to, consider having {checkingComponent} require that
-                            the connection be over TLS, and require that the server properly proves its identity.</li>
-                        <li>
-                            If {spoofedComponent} acts as a client which connects to {checkingComponent}, consider having {checkingComponent} require that
-                            {spoofedComponent} prove that it knows a secret having enough entropy that it would be impractical for an attacker to guess (e.g.
-                            an access token sent over TLS or a TLS client certificate).
-                        </li>
+                        {checkingComponentActAsClient &&
+                            <li>
+                                You indicated that {checkingComponent} acts as a client - consider having {checkingComponent} only connect to {spoofedComponent}
+                                &nbsp;using TLS and require that the server prove its identity with a valid certificate signed by a trusted CA.
+                            </li>
+                        }
+
+                        {checkingComponentActsAsServer && 
+                            <li>
+                                You indicated that {checkingComponent} acts as a server - consider having {checkingComponent} require that
+                                {spoofedComponent} prove that it knows a secret having enough entropy that it would be impractical for an attacker to guess (e.g.
+                                an access token sent over TLS or a TLS client certificate).
+                            </li>
+                        }
                         <li>
                             If {spoofedComponent} and {checkingComponent} exchange messages outside of a server/client relationship (e.g. via a message broker, or a 
                             non-TCP channel), consider having both components require messages to be signed with a&nbsp;
@@ -221,17 +237,39 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                         </li>
                     </ul>
                 </ProTip>
-                {(getNamesOfTraitsPresentForComponent(componentTraitsMap, checkingComponent).has(Traits.AzureResource.name) ||
-                    getNamesOfTraitsPresentForComponent(componentTraitsMap, spoofedComponent).has(Traits.AzureResource.name)) && <ProTip>
-                    You indicated that at least one of these components is an Azure resource - when acting as server, some Azure services offer the ability to manage TLS certificates 
-                    for your custom domains (and their corresponding private keys) for you automatically, such as&nbsp;
-                    <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-certificate#create-a-free-managed-certificate">App Service</a> and&nbsp;
-                    <a href="https://docs.microsoft.com/en-us/azure/frontdoor/standard-premium/how-to-configure-https-custom-domain#azure-managed-certificates">Front Door</a>.
+                
+                { spoofedComponentActsAsServer && spoofedComponentTraitNames.has(Traits.AzureResource.name) && 
+                    <ProTip>
+                        You indicated that at {spoofedComponent} is an Azure resource, and that it acts as a server - some Azure services offer the ability to manage TLS certificates 
+                                for your custom domains (and their corresponding private keys) for you automatically, such as&nbsp;
+                                <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-certificate#create-a-free-managed-certificate">App Service</a> and&nbsp;
+                                <a href="https://docs.microsoft.com/en-us/azure/frontdoor/standard-premium/how-to-configure-https-custom-domain#azure-managed-certificates">Front Door</a>.
+                    </ProTip>
+                }
 
-                    <p>When acting as a client, many Azure services make it easy for your code to authenticate to other Azure resources by providing&nbsp;
-                    <a href="https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview">managed identity
-                    credentials</a> to your code.</p>
-                </ProTip>}
+                { spoofedComponentActsAsClient && spoofedComponentTraitNames.has(Traits.AzureResource.name) && checkingComponentTraitNames.has(Traits.AzureResource.name) &&
+                    <ProTip>
+                        You indicated that {spoofedComponent} acts as a client, it is an Azure resource, and that {checkingComponent} is also an Azure resource - many Azure services 
+                            make it easy for your code to authenticate to other Azure resources by providing&nbsp;
+                            <a href="https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview">managed identity
+                            credentials</a> to your code, which {spoofedComponent} can use when connecting to {checkingComponent}.
+                    </ProTip>
+                }
+
+                { spoofedComponentActsAsClient && checkingComponentTraitNames.has(Traits.AzureResource.name) &&
+                    <ProTip>
+                        You indicated that {spoofedComponent} acts as a client, and that {checkingComponent} is also an Azure resource - 
+                            some Azure resources can also help you authenticate clients, such as&nbsp; 
+                        <a href="https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization">App Service built-in authentication and authorization.</a>
+                    </ProTip>
+                }
+                       
+                {!(checkingComponentTraitNames.has(Traits.ActsAsAServer.name) || checkingComponentTraitNames.has(Traits.ActsAsAClient.name)) &&
+                    <ProTip>
+                        To get better suggestions here about how to verify {spoofedComponent}'s identity, add the '{Traits.ActsAsAServer.name}' and/or
+                        '{Traits.ActsAsAClient.name}' traits to {checkingComponent} and {spoofedComponent}.
+                    </ProTip>
+                }
             </Typography>
         }
 

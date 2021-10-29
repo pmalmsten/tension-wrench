@@ -4,7 +4,7 @@ export interface Trait {
     description: string
 }
 
-export const Traits = {
+export const Traits: { [key: string]: Trait } = {
     OutOfScope: {
         name: 'Out of Scope',
         description: 'Our system interacts with this component, but we are not responsible for securing it.'
@@ -16,6 +16,14 @@ export const Traits = {
     MyCodeRunsHere: {
         name: 'My Code Runs Here',
         description: 'Code you or your team wrote runs on this resource.'
+    },
+    ActsAsAClient: {
+        name: 'Acts as a CLient',
+        description: 'This component connects to other components'
+    },
+    ActsAsAServer: {
+        name: 'Acts as a Server',
+        description: 'Other components connect to this component'
     }
 };
 
