@@ -1,6 +1,6 @@
-# Trenchcoat
+# Tension Wrench
 
-Trenchcoat is an interactive security brainstorming guide website that helps software engineers brainstorm things attackers might try to do to exploit a software system
+Tension Wrench is an interactive security brainstorming guide website that helps software engineers brainstorm things attackers might try to do to exploit a software system
 and ways to defend against them.
 
 Try it out here: https://trenchcoat.z5.web.core.windows.net/

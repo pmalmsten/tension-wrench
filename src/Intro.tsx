@@ -14,7 +14,7 @@ export default function Intro() {
       <p>
         This tool will help you think about how attackers might probe a software system
         that you are building. Once you describe a few things about your project,
-        Trenchcoat will generate a discussion guide use can use with your team to start
+        Tension Wrench will generate a discussion guide use can use with your team to start
         thinking about what attackers might try in order to break in and ways to stop
         them.
       </p>
