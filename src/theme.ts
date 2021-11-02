@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
 import { createTheme } from '@mui/material/styles';
 
 // A custom theme for this app
