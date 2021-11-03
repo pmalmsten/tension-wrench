@@ -3,7 +3,7 @@
 Tension Wrench is an interactive security brainstorming guide website that helps software engineers brainstorm things attackers might try to do to exploit a software system
 and ways to defend against them.
 
-Try it out here: https://trenchcoat.z5.web.core.windows.net/
+Try it out here: https://pmalmsten.github.io/tension-wrench/
 
 **Note: This is a small project created and maintained by an individual developer as part of an internal hackathon at Microsoft - as such, this project is not formally supported by Microsoft.**
 
