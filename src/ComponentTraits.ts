@@ -21,7 +21,7 @@ export const Traits: { [key: string]: Trait } = {
         description: 'Code you or your team wrote runs on this resource.'
     },
     ActsAsAClient: {
-        name: 'Acts as a CLient',
+        name: 'Acts as a Client',
         description: 'This component connects to other components'
     },
     ActsAsAServer: {
