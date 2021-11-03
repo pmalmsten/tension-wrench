@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "license": "MIT",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
