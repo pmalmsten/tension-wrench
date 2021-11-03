@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
 name: Build & Publish to Github Pages Branch
 
 on:
