@@ -50,7 +50,7 @@ function NewDataFlowForm(props: {
           <Grid item xs={6}>
             <Autocomplete
               onChange={(event, value) => { setDestComponent(value) }}
-              disabled={sourceComponent === undefined}
+              disabled={sourceComponent === null}
               value={destComponent}
               disablePortal
               options={props.componentChoices
