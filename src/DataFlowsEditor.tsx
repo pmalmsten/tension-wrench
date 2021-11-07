@@ -5,7 +5,7 @@ import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { Autocomplete, Button, IconButton, List, ListItem, ListItemText} from '@mui/material';
+import { Autocomplete, IconButton, List, ListItem, ListItemText} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 interface DataFlowEditorProps {
@@ -21,26 +21,27 @@ function NewDataFlowForm(props: {
   handleSubmit: (sourceComponent: string, destComponent: string) => void 
 }) {
   const [sourceComponent, setSourceComponent] = React.useState<string | null>(null)
-  const [destComponent, setDestComponent] = React.useState<string | null>(null)
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleDestComponentChange = (destComponent: string | null) => {
     if (sourceComponent !== null && destComponent !== null) {
       props.handleSubmit(sourceComponent, destComponent)
-      setSourceComponent(null)
-      setDestComponent(null)
+      setSourceComponent(null);
+
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
     }
-    event.preventDefault()
   }
 
   const dataFlowExists = (sourceComponent: string, destComponent: string) => props.dataFlows.get(sourceComponent)?.has(destComponent) ||
     props.dataFlows.get(destComponent)?.has(sourceComponent)
 
   return <React.Fragment>
-    <form onSubmit={handleSubmit}>
+    <form>
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Autocomplete
-              onChange={(event, value) => { setSourceComponent(value) }}
+              onChange={(_, value) => { setSourceComponent(value) }}
               value={sourceComponent}
               disablePortal
               options={props.componentChoices}
@@ -49,18 +50,15 @@ function NewDataFlowForm(props: {
           </Grid>
           <Grid item xs={6}>
             <Autocomplete
-              onChange={(event, value) => { setDestComponent(value) }}
+              onChange={(_, value) => { handleDestComponentChange(value) }}
               disabled={sourceComponent === null}
-              value={destComponent}
+              value={null}
               disablePortal
               options={props.componentChoices
                 .filter(choice => choice !== sourceComponent)
                 .filter(choice => sourceComponent == null || !dataFlowExists(sourceComponent, choice))}
               renderInput={(params) => <TextField {...params} label="Destination Component" required />}
             />
-          </Grid>
-          <Grid item xs={6}>
-            <Button variant="contained" type="submit">Add Data Flow</Button>
           </Grid>
         </Grid>
       </form>
