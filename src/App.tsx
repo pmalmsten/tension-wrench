@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import Checkout from './Checkout';
+import DiscussionWizard from './DiscussionWizard';
 
 export default function App() {
   return (
-    <Checkout /> 
+    <DiscussionWizard /> 
   );
 }
