@@ -37,7 +37,7 @@ function Copyright() {
 
 const steps = ['Intro', 'Components', 'Data Flows', 'Discussion Guide'];
 
-export default function Checkout() {
+export default function DiscussionWizard() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [components, setComponents] = React.useState<string[]>([]);
   const [componentTraitsMap, setComponentTraitsMap] = React.useState(new Map<string, Trait[]>())
