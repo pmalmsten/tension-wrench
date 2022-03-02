@@ -63,6 +63,43 @@ export default function DiscussionWizard() {
     setComponentTraitsMap(updatedComponentTraitsMap)
   }
 
+  const addComponentTrait = (component: string, trait: Trait) => {
+    var updatedComponentTraitsMap = new Map(Array.from(componentTraitsMap, ([key, value]: [string, Trait[]]) => [key, Array.from(value)]))
+
+    var componentTraits = updatedComponentTraitsMap.get(component)
+    if (componentTraits === undefined) {
+      throw new Error("Expected component to exist")
+    }
+
+    if (!componentTraits.some(it => it.name === trait.name)) {
+      componentTraits.push(trait)
+    }
+
+    setComponentTraitsMap(updatedComponentTraitsMap)
+  }
+
+  const removeComponentTrait = (component: string, trait: Trait) => {
+    var updatedComponentTraitsMap = new Map(Array.from(componentTraitsMap, ([key, value]: [string, Trait[]]) => [key, Array.from(value)]))
+
+    var componentTraits = updatedComponentTraitsMap.get(component)
+    if (componentTraits === undefined) {
+      throw new Error("Expected component to exist")
+    }
+
+    componentTraits = componentTraits.filter(it => it.name !== trait.name)
+    updatedComponentTraitsMap.set(component, componentTraits)
+    setComponentTraitsMap(updatedComponentTraitsMap)
+  }
+
+  const componentHasTrait = (component: string, trait: Trait) => {
+    var componentTraits = componentTraitsMap.get(component)
+    if (componentTraits === undefined) {
+      throw new Error("Expected component to exist")
+    }
+
+    return componentTraits.some(it => it.name === trait.name)
+  }
+
   const addComponent = (component: string) => {
     var updatedComponents = new Set(components)
     updatedComponents.add(component)
@@ -147,7 +184,16 @@ export default function DiscussionWizard() {
                 {
                   [
                     <Intro />,
-                    <ComponentsEditor components={components} componentTraitsMap={componentTraitsMap} addComponent={addComponent} removeComponent={removeComponent} setComponentTraits={setComponentTraits} />,
+                    <ComponentsEditor 
+                      components={components} 
+                      componentTraitsMap={componentTraitsMap} 
+                      addComponent={addComponent} 
+                      removeComponent={removeComponent} 
+                      setComponentTraits={setComponentTraits}
+                      addComponentTrait={addComponentTrait}
+                      removeComponentTrait={removeComponentTrait}
+                      componentHasTrait={componentHasTrait}
+                    />,
                     <DataFlowsEditor 
                       components={components}
                       dataFlows={dataFlows}
