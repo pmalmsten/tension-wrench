@@ -36,13 +36,6 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                         permissions, network access control lists, or cloud provider access mangement tools. Only grant access to users and systems
                         that need access, and grant as little access as possible.
                     </ProTip>
-                    {componentTraitNamesSet.has(Traits.AzureResource.name) && <ProTip>
-                        You indicated that this is an Azure resource - Azure RBAC allows one to configure fine-grained control over which users or systems
-                        have the ability to administer Azure resources - 
-                        consider granting the narrowest possible roles to the users and systems that need to manage this resource. In addition, some Azure 
-                        resources offer additional tools for restricting access, such as VNet support, data plane role-based access control (such as for Cosmos DB), 
-                        or IP address filtering.
-                    </ProTip>}
                 </Typography>
             },
             {
@@ -67,10 +60,6 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                             </li>
                         </ul>
                     </ProTip>
-                    {componentTraitNamesSet.has(Traits.AzureResource.name) && <ProTip>
-                        You indicated that this is an Azure resource - many Azure resources offer <a href="https://docs.microsoft.com/en-us/azure/azure-monitor/essentials/platform-logs-overview">
-                        built-in support for collecting diagostic logs.</a> Consider enabling diagostic logging for this resource. 
-                    </ProTip>}
                 </Typography>,
             },
             {
@@ -105,15 +94,6 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                             </li>
                         </ul>
                     </ProTip>
-                    {componentTraitNamesSet.has(Traits.AzureResource.name) && <ProTip>
-                        You indicated that this is an Azure resource - Many Azure resources offer tools for controlling which other systems can access access data, such as VNet support, 
-                        data plane role-based access control (such as for Cosmos DB), IP address filtering, and others. Consider how you might leverage these to limit access to this
-                        resource to just those users or systems who need it.
-                        
-                        <p>Azure offers <a href="https://docs.microsoft.com/en-us/azure/security/fundamentals/encryption-overview">a varity of tools to help you encrypt data</a>, both
-                        'server side' (encryption at rest provided transparently by Azure resources for you) and 'client side' (encryption your application performs before storing
-                        data).</p>
-                    </ProTip>}
                 </Typography>,
             },
             {
@@ -139,21 +119,6 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                             <li>Use a DDoS protection service provider in front of this component in order to defend against excessive network traffic.</li>
                         </ul>
                     </ProTip>
-                    {componentTraitNamesSet.has(Traits.AzureResource.name) && <ProTip>
-                        You indicated that this is an Azure resource - Azure offers a varity of tools to help defend against denial of service attacks, including:
-                        <ul>
-                            <li><a href="https://docs.microsoft.com/en-us/azure/api-management/api-management-key-concepts">Azure API Management</a> provides 
-                                configurable rules for limiting how often a given subscriber may call an API.
-                            </li>
-                            <li>Azure Front Door provides a <a href="https://docs.microsoft.com/en-us/azure/frontdoor/front-door-ddos">variety of DDoS protections built-in</a> that
-                                can help stop floods of illegtimate network traffic before they arrive at your system.
-                                <ul>
-                                    <li><a href="https://docs.microsoft.com/en-us/azure/web-application-firewall/overview">Azure Web Application Firewall</a> (which can integrate 
-                                    with Azure Front Door) also offers rules for rate limiting requests by client IP address.</li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </ProTip>}
                 </Typography>,
             },
             {
@@ -188,24 +153,11 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                             </li>
                         </ul>
                     </ProTip>
-                    {componentTraitNamesSet.has(Traits.AzureResource.name) && <ProTip>
-                        You indicated that this is an Azure resource - as an example of how to keep commands separate from data, if this component accesses Cosmos DB using the SQL API, consider 
-                        using <a href="https://docs.microsoft.com/en-us/azure/cosmos-db/sql/sql-query-parameterized-queries">CosmosDB parameterized queries.</a>
-                    </ProTip>}
                 </Typography>,
             }
         ];
 
         const createSpoofingStepContent = (spoofedComponent: string, checkingComponent: string) => {
-            const spoofedComponentTraitNames = getNamesOfTraitsPresentForComponent(componentTraitsMap, spoofedComponent)
-            const checkingComponentTraitNames = getNamesOfTraitsPresentForComponent(componentTraitsMap, checkingComponent)
-
-            const spoofedComponentActsAsClient = spoofedComponentTraitNames.has(Traits.ActsAsAClient.name)
-            const spoofedComponentActsAsServer = spoofedComponentTraitNames.has(Traits.ActsAsAServer.name)
-
-            const checkingComponentActAsClient = checkingComponentTraitNames.has(Traits.ActsAsAClient.name)
-            const checkingComponentActsAsServer = checkingComponentTraitNames.has(Traits.ActsAsAServer.name)
-
             return <Typography>
                 An attacker might try to pretend to be '{spoofedComponent}' in order to gain access they should not have.
                 <p>Examples include:
@@ -218,61 +170,28 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                     Consider having {checkingComponent} require that {spoofedComponent} prove its identity using a strong identification mechanism
                     that is difficult to forge. For example:
                     <ul>
-                        {checkingComponentActAsClient &&
-                            <li>
-                                You indicated that {checkingComponent} acts as a client - consider having {checkingComponent} only connect to {spoofedComponent}
-                                &nbsp;using TLS and require that the server prove its identity with a valid certificate signed by a trusted CA.
-                            </li>
-                        }
-
-                        {checkingComponentActsAsServer && 
-                            <li>
-                                You indicated that {checkingComponent} acts as a server - consider having {checkingComponent} require that
-                                {spoofedComponent} prove that it knows a secret having enough entropy that it would be impractical for an attacker to guess (e.g.
-                                an access token sent over TLS or a TLS client certificate).
-                            </li>
-                        }
                         <li>
-                            If {spoofedComponent} and {checkingComponent} exchange messages outside of a server/client relationship (e.g. via a message broker, or a 
+                            If {spoofedComponent} and {checkingComponent} have a client/server relationship, and:
+                            <ul>
+                                <li> 
+                                    If {spoofedComponent} acts as the server, consider having {checkingComponent} only connect to the server over TLS while 
+                                    verifying that the server presents a valid certificate (signed by a trusted certificate authority).
+                                </li>
+                                <li>
+                                    If {spoofedComponent} acts as the client, consider having {checkingComponent} expect that {spoofedComponent} present a
+                                    difficult-to-forge token (e.g. an <a href="https://oauth.net/2/bearer-tokens/">OAuth Bearer Token</a>) over a confidential channel (e.g. TLS),
+                                    or having {checkingComponent} expect that {spoofedComponent} prove it's identity via <a href="https://www.cloudflare.com/learning/access-management/what-is-mutual-tls/">TLS Mutual Authentication</a>.
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            If {spoofedComponent} and {checkingComponent} exchange messages outside of a client/server relationship (e.g. via a message broker, or a 
                             non-TCP channel), consider having both components require messages to be signed with a&nbsp;
                             <a href="https://en.wikipedia.org/wiki/Message_authentication_code">message authentication code</a> or&nbsp;
                             <a href="https://en.wikipedia.org/wiki/Digital_signature">digital signature</a>.
                         </li>
                     </ul>
                 </ProTip>
-                
-                { spoofedComponentActsAsServer && spoofedComponentTraitNames.has(Traits.AzureResource.name) && 
-                    <ProTip>
-                        You indicated that at {spoofedComponent} is an Azure resource, and that it acts as a server - some Azure services offer the ability to manage TLS certificates 
-                                for your custom domains (and their corresponding private keys) for you automatically, such as&nbsp;
-                                <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-certificate#create-a-free-managed-certificate">App Service</a> and&nbsp;
-                                <a href="https://docs.microsoft.com/en-us/azure/frontdoor/standard-premium/how-to-configure-https-custom-domain#azure-managed-certificates">Front Door</a>.
-                    </ProTip>
-                }
-
-                { spoofedComponentActsAsClient && spoofedComponentTraitNames.has(Traits.AzureResource.name) && checkingComponentTraitNames.has(Traits.AzureResource.name) &&
-                    <ProTip>
-                        You indicated that {spoofedComponent} acts as a client, it is an Azure resource, and that {checkingComponent} is also an Azure resource - many Azure services 
-                            make it easy for your code to authenticate to other Azure resources by providing&nbsp;
-                            <a href="https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview">managed identity
-                            credentials</a> to your code, which {spoofedComponent} can use when connecting to {checkingComponent}.
-                    </ProTip>
-                }
-
-                { spoofedComponentActsAsClient && checkingComponentTraitNames.has(Traits.AzureResource.name) &&
-                    <ProTip>
-                        You indicated that {spoofedComponent} acts as a client, and that {checkingComponent} is also an Azure resource - 
-                            some Azure resources can also help you authenticate clients, such as&nbsp; 
-                        <a href="https://docs.microsoft.com/en-us/azure/app-service/overview-authentication-authorization">App Service built-in authentication and authorization.</a>
-                    </ProTip>
-                }
-                       
-                {!(checkingComponentTraitNames.has(Traits.ActsAsAServer.name) || checkingComponentTraitNames.has(Traits.ActsAsAClient.name)) &&
-                    <ProTip>
-                        To get better suggestions here about how to verify {spoofedComponent}'s identity, add the '{Traits.ActsAsAServer.name}' and/or
-                        '{Traits.ActsAsAClient.name}' traits to {checkingComponent} and {spoofedComponent}.
-                    </ProTip>
-                }
             </Typography>
         }
 

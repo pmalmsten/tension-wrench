@@ -5,11 +5,9 @@ import * as React from 'react';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { Autocomplete, Box, Button, IconButton, List, ListItem, ListItemText, Paper, Tooltip} from '@mui/material';
+import { Button, Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemText, Paper} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import HelpIcon from '@mui/icons-material/Help';
-import { useTheme } from '@mui/material/styles';
-import { AllTraits, Trait } from './ComponentTraits';
+import { Trait, Traits } from './ComponentTraits';
 
 interface ComponentsEditorProps {
   components: string[],
@@ -17,6 +15,9 @@ interface ComponentsEditorProps {
   addComponent: (component: string) => void,
   removeComponent: (component: string) => void
   setComponentTraits: (component: string, selectedTraits: Trait[]) => void
+  addComponentTrait: (component: string, trait: Trait) => void
+  removeComponentTrait: (component: string, trait: Trait) => void
+  componentHasTrait: (component: string, trait: Trait) => boolean
 }
 
 function NewComponentForm(props: { handleSubmit: (newComponentName: string) => void }) {
@@ -47,7 +48,6 @@ function NewComponentForm(props: { handleSubmit: (newComponentName: string) => v
 }
 
 export default function ComponentsEditor(props: ComponentsEditorProps) {
-  const theme = useTheme()
 
   return (
     <React.Fragment>
@@ -74,52 +74,30 @@ export default function ComponentsEditor(props: ComponentsEditorProps) {
               <Grid container>
                 <Grid item xs={12}>
                   <ListItemText
-                    primary={component}
+                    primary={<Typography variant="h6">{component}</Typography>}
                   />
                 </Grid>
-                <Grid item xs={7}>
+                <Grid item xs={10}>
                   <Grid container direction="row" alignItems="center">
-                    <Grid item xs={11}>
-                      <Autocomplete
-                        multiple
-                        id="tags-standard"
-                        options={AllTraits}
-                        value={props.componentTraitsMap.get(component) ?? []}
-                        getOptionLabel={(option) => option.name}
-                        renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              variant="standard"
-                              label="Traits"
-                              placeholder="Traits"
-                            />
-                        )}
-                        renderOption={(props, option) => (
-                          <li {...props}>
-                            <Box
-                              sx={{
-                                flexGrow: 1,
-                                '& span': {
-                                  color:
-                                    theme.palette.mode === 'light' ? '#586069' : '#8b949e',
-                                },
-                              }}
-                            >
-                              {option.name}
-                              <br />
-                              <span>{option.description}</span>
-                            </Box>
-                          </li>
-                        )}
-                        onChange={(_event, selectedTraits) => { props.setComponentTraits(component, selectedTraits)}}
-                      />
-                    </Grid>
-                    <Grid item>
-                      <Box sx={{marginTop: '1em'}}>
-                        <Tooltip title="Add relevant traits to improve the suggestions provided in the discussion guide.">
-                          <HelpIcon />
-                        </Tooltip>
-                      </Box>
+                    <Grid item xs={12}>
+                      <FormControlLabel 
+                        control={
+                          <Checkbox 
+                            onChange={(_event, checked) => { if (checked) { props.addComponentTrait(component, Traits.OutOfScope)} else { props.removeComponentTrait(component, Traits.OutOfScope) }}}
+                            checked={props.componentHasTrait(component, Traits.OutOfScope)}
+                          />
+                        } 
+                        label={
+                          <div>
+                            <Typography variant="subtitle2">
+                              Out of Scope
+                            </Typography>
+                            <Typography variant="caption">
+                              Our system interacts with this component, but we are not responsible for securing it.
+                            </Typography>
+                          </div>
+                        } 
+                    />
                     </Grid>
                   </Grid>
                 </Grid>
