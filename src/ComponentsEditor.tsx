@@ -7,7 +7,6 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import { Button, Checkbox, FormControlLabel, IconButton, List, ListItem, ListItemText, Paper} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useTheme } from '@mui/material/styles';
 import { Trait, Traits } from './ComponentTraits';
 
 interface ComponentsEditorProps {
@@ -49,7 +48,6 @@ function NewComponentForm(props: { handleSubmit: (newComponentName: string) => v
 }
 
 export default function ComponentsEditor(props: ComponentsEditorProps) {
-  const theme = useTheme()
 
   return (
     <React.Fragment>
