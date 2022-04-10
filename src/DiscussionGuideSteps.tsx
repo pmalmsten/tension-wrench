@@ -32,7 +32,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                         <li>An attacker might try to delete or destroy a resource in order to take a system offline.</li>
                     </ul></p> 
                     <ProTip>
-                        Consider using an access control mechanism to restrict acess to this resource. Some examples include operating system user
+                        Consider using an access control mechanism to restrict access to this resource. Some examples include operating system user
                         permissions, network access control lists, or cloud provider access mangement tools. Only grant access to users and systems
                         that need access, and grant as little access as possible.
                     </ProTip>
@@ -73,7 +73,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                         <li>An attacker gains access to this component by exploiting incorrect access control settings and extracts confidential information from this resource.</li>
                     </ul></p>
                     <ProTip>
-                        Consider using an access control mechanism to restrict acess to this resource. Some examples include operating system user
+                        Consider using an access control mechanism to restrict access to this resource. Some examples include operating system user
                         permissions, network access control lists, or cloud provider access mangement tools. Only grant access to users and systems
                         that need access, and grant as little access as possible.
                     </ProTip>
@@ -81,15 +81,13 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                         For particularly sensitive / high-value information stored at rest, consider whether additional defenses may be appropriate. For example:
                         <ul>
                             <li>
-                                When storing passwords: consider whether you can avoid storing passwords at all by using a third-party authentication provider instead 
-                                (like <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-overview"> Microsoft Identity Platform</a>). If you must
-                                store passwords, follow guidelines for doing so safely (like 
-                                <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP's Password Cheat Sheet</a>)
+                                When storing passwords: consider whether you can avoid storing passwords at all by using a third-party authentication provider instead
+                                (like <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-overview">Microsoft Identity Platform</a>). If you must
+                                store passwords, follow guidelines for doing so safely (like <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP's Password Cheat Sheet</a>)
                             </li>
                             <li>
                                 When storing other confidential information: consider encrypting the sensitive information before storing it, which would make it much more difficult
-                                for an attacker to make use of any data they gain acess to. Follow guidelines like 
-                                <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html">OWASP's Cryptographic Storage cheat sheet</a>, and/or regulatory
+                                for an attacker to make use of any data they gain access to. Follow guidelines like <a href="https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html">OWASP's Cryptographic Storage cheat sheet</a>, and/or regulatory
                                 standards like PCI-DSS, HIPAA, or FedRAMP that might apply to your use case.
                             </li>
                         </ul>
@@ -144,8 +142,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                             <li>Validate inputs carefully before acting on them.</li>
                             <li>When this component calls another component on behalf of a client, indicate to the downstream system who the call is being made on behalf of; this allows
                                 the downstream system to determine whether the originator of the request is authorized (in addition to checking that this component is allowed to)
-                                make the call. For more specific examples, see 
-                                <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow">Microsoft Identity Platform</a> on-behalf-of flow and 
+                                make the call. For more specific examples, see <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-on-behalf-of-flow">Microsoft Identity Platform</a> on-behalf-of flow and 
                                 the <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html">AWS IAM external ID</a> field.
                             </li>
                             <li>Run this component with the least privilege necessary for it to function. For processes on a host, run as non-administrative system user having minimal
@@ -262,9 +259,9 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                             Consider having {component} and {destComponent} protect the contents of messages exchanged between them using a security control that provides
                             confidentiality (e.g. encryption). For example:
                             <ul>
-                                <li>When using TCP, TLS provides confidentiality through encryption. See 
-                                    <a href="https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html">OWASP's Transport Layer Protection cheat sheet</a> for specific
-                                    guidance.
+                                <li>
+                                    When using TCP, TLS provides confidentiality through encryption. 
+                                    See <a href="https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html">OWASP's Transport Layer Protection cheat sheet</a> for specific guidance.
                                 </li>
                                 <li>When using UDP, dTLS provides confidentiality through encryption similar to that of TLS.</li>
                             </ul>
