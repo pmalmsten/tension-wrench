@@ -15,7 +15,8 @@
     "react-dom": "latest",
     "react-router-dom": "^6.3.0",
     "react-scripts": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "yaml": "^2.0.1"
   },
   "eslintConfig": {
     "extends": [

@@ -7,7 +7,7 @@ import Link from '@mui/material/Link';
 import DiscussionWizard from './DiscussionWizard';
 import FloatingFeedbackLink from './FloatingFeedbackLink';
 import theme from './theme';
-import React from 'react';
+import PRChecklist from './PRChecklist';
 
 function Copyright() {
   return (
@@ -42,7 +42,7 @@ export default function App() {
       </AppBar>
       <Routes>
         <Route path="/" element={<DiscussionWizard />} />
-        <Route path="pr-checklist" element={<React.Fragment>Hello World!</React.Fragment>} />
+        <Route path="pr-checklist" element={<PRChecklist />} />
       </Routes>
       <FloatingFeedbackLink />
       <footer style={{ padding: theme.spacing(2)}}>
