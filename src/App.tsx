@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { ThemeProvider } from '@emotion/react';
-import { CssBaseline, AppBar, Toolbar, Typography } from '@mui/material';
+import { AppBar, Toolbar, Typography } from '@mui/material';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Link from '@mui/material/Link';
 import DiscussionWizard from './DiscussionWizard';
 import FloatingFeedbackLink from './FloatingFeedbackLink';
 import theme from './theme';
+import React from 'react';
 
 function Copyright() {
   return (
@@ -23,8 +24,7 @@ function Copyright() {
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <BrowserRouter>
       <AppBar
         position="absolute"
         color="default"
@@ -40,11 +40,14 @@ export default function App() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <DiscussionWizard />
+      <Routes>
+        <Route path="/" element={<DiscussionWizard />} />
+        <Route path="pr-checklist" element={<React.Fragment>Hello World!</React.Fragment>} />
+      </Routes>
       <FloatingFeedbackLink />
       <footer style={{ padding: theme.spacing(2)}}>
           <Copyright />
       </footer>
-    </ThemeProvider>
+    </BrowserRouter>
   );
 }
