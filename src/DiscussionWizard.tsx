@@ -2,38 +2,18 @@
 // Licensed under the MIT License.
 
 import * as React from 'react';
-import CssBaseline from '@mui/material/CssBaseline';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import Toolbar from '@mui/material/Toolbar';
 import Paper from '@mui/material/Paper';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
-import Link from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
-import theme from './theme';
 import Intro from './Intro'
 import ComponentsEditor from './ComponentsEditor';
 import DataFlowsEditor from './DataFlowsEditor';
 import DiscussionGuide from './DiscussionGuide';
 import { Trait } from './ComponentTraits';
-import { ThemeProvider } from '@mui/system';
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://www.microsoft.com/">
-        Microsoft
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 const steps = ['Intro', 'Components', 'Data Flows', 'Discussion Guide'];
 
@@ -153,23 +133,6 @@ export default function DiscussionWizard() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AppBar
-        position="absolute"
-        color="default"
-        elevation={0}
-        sx={{
-          position: 'relative',
-          borderBottom: (t) => `1px solid ${t.palette.divider}`,
-        }}
-      >
-        <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap>
-            Tension Wrench - Learn to Defend against Hackers
-          </Typography>
-        </Toolbar>
-      </AppBar>
       <Container component="main" maxWidth='md' sx={{ mb: 4 }}>
         <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
           <Stepper activeStep={activeStep} sx={{ pt: 3, pb: 5 }}>
@@ -222,8 +185,6 @@ export default function DiscussionWizard() {
               </React.Fragment>
           </React.Fragment>
         </Paper>
-        <Copyright />
       </Container>
-    </ThemeProvider>
   );
 }
