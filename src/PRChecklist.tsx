@@ -8,25 +8,52 @@ import YAML from "yaml";
 var data = `
 questions:
 - text: First Question?
-  riskLevel: Medium
+  whenTrue:
+    taskListToInclude: MediumRiskChangeActionItems
+    additionalQuestionsToAsk: []
 - text: Second Question?
-  riskLevel: Medium
-- text: Third Question?
-  riskLevel: Medium
+  whenTrue:
+    taskListToInclude: HighRiskChangeActionItems
+- text: Third Question? 
 
-riskLevels:
-- id: Medium
-  checklistItems:
+taskLists:    
+- id: MediumRiskChangeActionItems
+  tasks:
   - text: Update the threat model
+- id: HighRiskChangeActionItems
+  extendsTaskList: MediumRiskChangeActionItems
+  tasks:
+  - test: Consult with a security engineer
 `;
 
-interface Question {
+
+interface TaskData {
     text: string
-    riskLevel: string
+}
+
+interface TaskListData {
+    id: string
+    extendsTaskList: string | undefined
+    tasks: TaskData[]
+}
+
+interface ConditionData {
+    taskListToInclude: string | undefined
+    additionalQuestionsToAsk: QuestionData[] | undefined
+}
+
+interface QuestionData {
+    text: string
+    whenTrue: ConditionData | undefined
+}
+
+interface ChecklistData {
+    questions: QuestionData[]
+    taskLists: TaskListData
 }
 
 export default function PRChecklist() {
-    var dataObj = YAML.parse(data);
+    var dataObj: ChecklistData = YAML.parse(data);
 
     return (
     <React.Fragment>
@@ -36,8 +63,8 @@ export default function PRChecklist() {
                 Pull Request Checklist
             </Typography>
                 <List>
-                    {dataObj["questions"].map((question: Question) => {
-                        return <ListItem>
+                    {dataObj.questions.map((question: QuestionData) => {
+                        return <ListItem key={question.text}>
                             <FormControlLabel
                                 control={<Checkbox />}
                                 label={question.text}
