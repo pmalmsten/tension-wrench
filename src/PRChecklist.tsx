@@ -1,16 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Checkbox, Container, FormControlLabel, List, ListItem, Paper, Typography } from "@mui/material";
-import React from "react";
+import { Checkbox, Container, List, ListItem, Paper, Typography } from "@mui/material";
+import React, { useState } from "react";
 import YAML from "yaml";
 
 var data = `
 questions:
 - text: First Question?
+  isChecked: true
   whenTrue:
     taskListToInclude: MediumRiskChangeActionItems
-    additionalQuestionsToAsk: []
+    additionalQuestionsToAsk: 
+    - text: Follow up?
+      whenTrue:
+        taskListToInclude: MediumRiskChangeActionItems
+        additionalQuestionsToAsk: []
 - text: Second Question?
   whenTrue:
     taskListToInclude: HighRiskChangeActionItems
@@ -45,6 +50,7 @@ interface ConditionData {
 interface QuestionData {
     text: string
     whenTrue: ConditionData | undefined
+    isChecked: boolean
 }
 
 interface ChecklistData {
@@ -52,8 +58,51 @@ interface ChecklistData {
     taskLists: TaskListData
 }
 
+interface QuestionComponentProps {
+    question: QuestionData
+    questionAccessorFn: (allQuestions: QuestionData[]) => QuestionData | undefined
+    onCheckedStateChanged: (questionAccessorFn: (allQuestions: QuestionData[]) => QuestionData | undefined, isChecked: boolean) => void
+}
+
+const QuestionComponent = (props: QuestionComponentProps): JSX.Element => {
+    return <React.Fragment>
+        <ListItem>
+            <Checkbox checked={props.question.isChecked ?? false} onChange={(event) => props.onCheckedStateChanged(props.questionAccessorFn, event.target.checked)} />{props.question.text}
+        </ListItem>
+        { props.question.isChecked && 
+            props.question.whenTrue?.additionalQuestionsToAsk !== undefined &&
+            props.question.whenTrue.additionalQuestionsToAsk.length > 0 && 
+            <ListItem>
+                <List>
+                    {props.question.whenTrue?.additionalQuestionsToAsk?.map((question, index) => 
+                        <QuestionComponent 
+                            question={question} 
+                            key={question.text}
+                            questionAccessorFn={(allQuestions) => props.questionAccessorFn(allQuestions)?.whenTrue?.additionalQuestionsToAsk?.at(index)}
+                            onCheckedStateChanged={props.onCheckedStateChanged}
+                            />
+                    )}
+                </List>
+            </ListItem>
+        }
+    </React.Fragment>
+}
+
 export default function PRChecklist() {
-    var dataObj: ChecklistData = YAML.parse(data);
+    const [dataObj, setDataObj] = useState<ChecklistData>(YAML.parse(data));
+
+    const handleCheckedStateChanged = (accessor: (allQuestions: QuestionData[]) => QuestionData | undefined, isChecked: boolean) => {
+        const copy = JSON.parse(JSON.stringify(dataObj)) as ChecklistData;
+        
+        const questionReference = accessor(copy.questions);
+        if (questionReference === undefined) {
+            throw new Error("Question reference was undefined");
+        }
+
+        questionReference.isChecked = isChecked;
+
+        setDataObj(copy)
+    }
 
     return (
     <React.Fragment>
@@ -63,13 +112,13 @@ export default function PRChecklist() {
                 Pull Request Checklist
             </Typography>
                 <List>
-                    {dataObj.questions.map((question: QuestionData) => {
-                        return <ListItem key={question.text}>
-                            <FormControlLabel
-                                control={<Checkbox />}
-                                label={question.text}
-                                />
-                        </ListItem>
+                    {dataObj.questions.map((question, index) => {
+                        return <QuestionComponent 
+                            question={question} 
+                            key={question.text}
+                            questionAccessorFn={(allQuestions) => allQuestions[index]}
+                            onCheckedStateChanged={handleCheckedStateChanged}
+                            />
                     })}
                 </List>
             </Paper>
