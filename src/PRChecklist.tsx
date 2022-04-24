@@ -19,16 +19,18 @@ questions:
 - text: Second Question?
   whenTrue:
     taskListToInclude: HighRiskChangeActionItems
-- text: Third Question? 
+- text: Third Question?
+  whenTrue:
+    taskListToInclude: HighRiskChangeActionItems
 
 taskLists:    
-- id: MediumRiskChangeActionItems
-  tasks:
-  - text: Update the threat model
-- id: HighRiskChangeActionItems
-  extendsTaskList: MediumRiskChangeActionItems
-  tasks:
-  - test: Consult with a security engineer
+  MediumRiskChangeActionItems:
+    tasks:
+    - text: Update the threat model
+  HighRiskChangeActionItems:
+    extendsTaskList: MediumRiskChangeActionItems
+    tasks:
+    - text: Consult with a security engineer
 `;
 
 
@@ -55,7 +57,9 @@ interface QuestionData {
 
 interface ChecklistData {
     questions: QuestionData[]
-    taskLists: TaskListData
+    taskLists: { 
+        [key: string]: TaskListData 
+    }
 }
 
 interface QuestionComponentProps {
@@ -88,6 +92,19 @@ const QuestionComponent = (props: QuestionComponentProps): JSX.Element => {
     </React.Fragment>
 }
 
+function resolveTasksFor(taskLists: {[key: string]: TaskListData}, taskListName: string): Set<TaskData> {
+    var result = new Set<TaskData>();
+    const taskData = taskLists[taskListName];
+    
+    if (taskData.extendsTaskList !== undefined) {
+        resolveTasksFor(taskLists, taskData.extendsTaskList).forEach(it => result.add(it))
+    }
+
+    taskData.tasks.forEach(it => result.add(it))
+
+    return result;
+}
+
 export default function PRChecklist() {
     const [dataObj, setDataObj] = useState<ChecklistData>(YAML.parse(data));
 
@@ -104,13 +121,19 @@ export default function PRChecklist() {
         setDataObj(copy)
     }
 
+    var tasksToDisplay = new Set<TaskData>();
+    dataObj.questions
+        .filter(it => it.isChecked)
+        .flatMap(it => it.whenTrue?.taskListToInclude !== undefined ? resolveTasksFor(dataObj.taskLists, it.whenTrue.taskListToInclude) : [])
+        .forEach(taskSet => Array.from(taskSet.values()).forEach(it => tasksToDisplay.add(it)))
+
     return (
     <React.Fragment>
         <Container component="main" maxWidth='md' sx={{ mb: 4 }}>
             <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-            <Typography variant="h6" gutterBottom>
-                Pull Request Checklist
-            </Typography>
+                <Typography variant="h6" gutterBottom>
+                    Pull Request Checklist
+                </Typography>
                 <List>
                     {dataObj.questions.map((question, index) => {
                         return <QuestionComponent 
@@ -121,6 +144,26 @@ export default function PRChecklist() {
                             />
                     })}
                 </List>
+            </Paper>
+            <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+                {tasksToDisplay.size === 0 && 
+                    <Typography variant="h6" gutterBottom>
+                        No additional tasks are needed for this PR.
+                    </Typography>
+                }
+                {tasksToDisplay.size > 0 &&
+                    <React.Fragment>
+                        <Typography variant="h6" gutterBottom>
+                            Make sure to perform the following additional tasks for this PR:
+                        </Typography>
+                        <List>
+                            {Array.from(tasksToDisplay.values()).map(task => 
+                                <ListItem key={task.text}>
+                                    {task.text}
+                                </ListItem>)}
+                        </List>
+                    </React.Fragment>
+                }
             </Paper>
         </Container>
     </React.Fragment>)
