@@ -1,0 +1,28 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT License.
+
+questions:
+- text: First Question?
+  isChecked: true
+  whenTrue:
+    taskListToInclude: MediumRiskChangeActionItems
+    additionalQuestionsToAsk: 
+    - text: Follow up?
+      whenTrue:
+        taskListToInclude: MediumRiskChangeActionItems
+        additionalQuestionsToAsk: []
+- text: Second Question?
+  whenTrue:
+    taskListToInclude: HighRiskChangeActionItems
+- text: Third Question?
+  whenTrue:
+    taskListToInclude: HighRiskChangeActionItems
+
+taskLists:    
+  MediumRiskChangeActionItems:
+    tasks:
+    - text: Update the threat model
+  HighRiskChangeActionItems:
+    extendsTaskList: MediumRiskChangeActionItems
+    tasks:
+    - text: Consult with a security engineer

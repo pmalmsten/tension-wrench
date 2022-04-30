@@ -1,38 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-import { Checkbox, Container, List, ListItem, Paper, Typography } from "@mui/material";
-import React, { useState } from "react";
+import { Box, Checkbox, CircularProgress, Container, List, ListItem, Paper, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import YAML from "yaml";
-
-var data = `
-questions:
-- text: First Question?
-  isChecked: true
-  whenTrue:
-    taskListToInclude: MediumRiskChangeActionItems
-    additionalQuestionsToAsk: 
-    - text: Follow up?
-      whenTrue:
-        taskListToInclude: MediumRiskChangeActionItems
-        additionalQuestionsToAsk: []
-- text: Second Question?
-  whenTrue:
-    taskListToInclude: HighRiskChangeActionItems
-- text: Third Question?
-  whenTrue:
-    taskListToInclude: HighRiskChangeActionItems
-
-taskLists:    
-  MediumRiskChangeActionItems:
-    tasks:
-    - text: Update the threat model
-  HighRiskChangeActionItems:
-    extendsTaskList: MediumRiskChangeActionItems
-    tasks:
-    - text: Consult with a security engineer
-`;
-
 
 interface TaskData {
     text: string
@@ -106,7 +77,16 @@ function resolveTasksFor(taskLists: {[key: string]: TaskListData}, taskListName:
 }
 
 export default function PRChecklist() {
-    const [dataObj, setDataObj] = useState<ChecklistData>(YAML.parse(data));
+    //const [dataObj, setDataObj] = useState<ChecklistData | undefined>(YAML.parse(data));
+    const [dataObj, setDataObj] = useState<ChecklistData | undefined>(undefined);
+
+    useEffect(() => {
+        if (dataObj === undefined) {
+            fetch("default-pr-checklist.yml")
+                .then(response => response.text()
+                    .then(data => setDataObj(YAML.parse(data))))
+        }
+    })
 
     const handleCheckedStateChanged = (accessor: (allQuestions: QuestionData[]) => QuestionData | undefined, isChecked: boolean) => {
         const copy = JSON.parse(JSON.stringify(dataObj)) as ChecklistData;
@@ -122,7 +102,7 @@ export default function PRChecklist() {
     }
 
     var tasksToDisplay = new Set<TaskData>();
-    dataObj.questions
+    dataObj?.questions
         .filter(it => it.isChecked)
         .flatMap(it => it.whenTrue?.taskListToInclude !== undefined ? resolveTasksFor(dataObj.taskLists, it.whenTrue.taskListToInclude) : [])
         .forEach(taskSet => Array.from(taskSet.values()).forEach(it => tasksToDisplay.add(it)))
@@ -130,41 +110,50 @@ export default function PRChecklist() {
     return (
     <React.Fragment>
         <Container component="main" maxWidth='md' sx={{ mb: 4 }}>
-            <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-                <Typography variant="h6" gutterBottom>
-                    Pull Request Checklist
-                </Typography>
-                <List>
-                    {dataObj.questions.map((question, index) => {
-                        return <QuestionComponent 
-                            question={question} 
-                            key={question.text}
-                            questionAccessorFn={(allQuestions) => allQuestions[index]}
-                            onCheckedStateChanged={handleCheckedStateChanged}
-                            />
-                    })}
-                </List>
-            </Paper>
-            <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-                {tasksToDisplay.size === 0 && 
+            {dataObj !== undefined && 
+            <React.Fragment>
+                <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
                     <Typography variant="h6" gutterBottom>
-                        No additional tasks are needed for this PR.
+                        Pull Request Checklist
                     </Typography>
-                }
-                {tasksToDisplay.size > 0 &&
-                    <React.Fragment>
+                    <List>
+                        {dataObj.questions.map((question, index) => {
+                            return <QuestionComponent 
+                                question={question} 
+                                key={question.text}
+                                questionAccessorFn={(allQuestions) => allQuestions[index]}
+                                onCheckedStateChanged={handleCheckedStateChanged}
+                                />
+                        })}
+                    </List>
+                </Paper>
+                <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+                    {tasksToDisplay.size === 0 && 
                         <Typography variant="h6" gutterBottom>
-                            Make sure to perform the following additional tasks for this PR:
+                            No additional tasks are needed for this PR.
                         </Typography>
-                        <List>
-                            {Array.from(tasksToDisplay.values()).map(task => 
-                                <ListItem key={task.text}>
-                                    {task.text}
-                                </ListItem>)}
-                        </List>
-                    </React.Fragment>
-                }
-            </Paper>
+                    }
+                    {tasksToDisplay.size > 0 &&
+                        <React.Fragment>
+                            <Typography variant="h6" gutterBottom>
+                                Make sure to perform the following additional tasks for this PR:
+                            </Typography>
+                            <List>
+                                {Array.from(tasksToDisplay.values()).map(task => 
+                                    <ListItem key={task.text}>
+                                        {task.text}
+                                    </ListItem>)}
+                            </List>
+                        </React.Fragment>
+                    }
+                </Paper>
+            </React.Fragment>}
+            {dataObj === undefined && 
+                <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+                    <Box sx={{ display: 'flex', "justify-content": 'center' }}>
+                        <CircularProgress />
+                    </Box>
+                </Paper>}
         </Container>
     </React.Fragment>)
 }
