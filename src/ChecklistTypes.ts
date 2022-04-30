@@ -6,7 +6,6 @@ export interface TaskData {
 }
 
 export interface TaskListData {
-    id: string
     extendsTaskList?: string
     tasks: TaskData[]
 }
@@ -19,7 +18,7 @@ export interface ConditionData {
 export interface QuestionData {
     text: string
     whenTrue?: ConditionData
-    isChecked: boolean
+    isChecked?: boolean
 }
 
 export interface ChecklistData {

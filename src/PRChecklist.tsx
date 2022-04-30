@@ -2,10 +2,13 @@
 // Licensed under the MIT License.
 
 import { Box, Checkbox, CircularProgress, Container, List, ListItem, Paper, Typography } from "@mui/material";
+import Ajv, { ValidateFunction } from "ajv";
 import React, { useEffect, useState } from "react";
 import YAML from "yaml";
 import "./ChecklistTypes";
 import { QuestionData, TaskListData, TaskData, ChecklistData } from "./ChecklistTypes";
+
+const ajv = new Ajv()
 
 interface QuestionComponentProps {
     question: QuestionData
@@ -51,14 +54,30 @@ function resolveTasksFor(taskLists: {[key: string]: TaskListData}, taskListName:
 }
 
 export default function PRChecklist() {
-    //const [dataObj, setDataObj] = useState<ChecklistData | undefined>(YAML.parse(data));
+    const [checklistDataSchema, setChecklistDataSchema] = useState<ValidateFunction<ChecklistData> | undefined>(undefined)
     const [dataObj, setDataObj] = useState<ChecklistData | undefined>(undefined);
 
     useEffect(() => {
-        if (dataObj === undefined) {
+        if (checklistDataSchema === undefined) {
+            fetch("generated/ChecklistDataSchema.json")
+                .then(response => response.json()
+                    .then(json => {
+                        var compiled = ajv.compile<ChecklistData>(json)
+                        // Wrap with function so that useState setter doesn't immediately call the validation function
+                        // while attempting to populate the value to store
+                        setChecklistDataSchema(() => compiled)
+                    }))
+        } else if (dataObj === undefined) {
             fetch("default-pr-checklist.yml")
                 .then(response => response.text()
-                    .then(data => setDataObj(YAML.parse(data))))
+                    .then(data => {
+                        var parsed = YAML.parse(data)
+                        if (checklistDataSchema(parsed)) {
+                            setDataObj(parsed)
+                        } else {
+                            throw new Error(`Checklist data failed to validate: ${checklistDataSchema.errors?.map(err => err.message).join(", ")}`)
+                        }
+                    }))
         }
     })
 
@@ -75,6 +94,8 @@ export default function PRChecklist() {
         setDataObj(copy)
     }
 
+    const isFullyLoaded = dataObj !== undefined
+
     var tasksToDisplay = new Set<TaskData>();
     dataObj?.questions
         .filter(it => it.isChecked)
@@ -84,7 +105,7 @@ export default function PRChecklist() {
     return (
     <React.Fragment>
         <Container component="main" maxWidth='md' sx={{ mb: 4 }}>
-            {dataObj !== undefined && 
+            {isFullyLoaded && 
             <React.Fragment>
                 <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
                     <Typography variant="h6" gutterBottom>
@@ -122,7 +143,7 @@ export default function PRChecklist() {
                     }
                 </Paper>
             </React.Fragment>}
-            {dataObj === undefined && 
+            {!isFullyLoaded && 
                 <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                         <CircularProgress />
