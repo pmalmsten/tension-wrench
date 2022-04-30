@@ -124,7 +124,7 @@ export default function PRChecklist() {
             </React.Fragment>}
             {dataObj === undefined && 
                 <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-                    <Box sx={{ display: 'flex', "justify-content": 'center' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                         <CircularProgress />
                     </Box>
                 </Paper>}
