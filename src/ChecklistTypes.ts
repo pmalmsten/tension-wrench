@@ -7,18 +7,18 @@ export interface TaskData {
 
 export interface TaskListData {
     id: string
-    extendsTaskList: string | undefined
+    extendsTaskList?: string
     tasks: TaskData[]
 }
 
 export interface ConditionData {
-    taskListToInclude: string | undefined
-    additionalQuestionsToAsk: QuestionData[] | undefined
+    taskListToInclude?: string
+    additionalQuestionsToAsk?: QuestionData[]
 }
 
 export interface QuestionData {
     text: string
-    whenTrue: ConditionData | undefined
+    whenTrue?: ConditionData
     isChecked: boolean
 }
 
