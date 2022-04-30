@@ -25,8 +25,11 @@
     ]
   },
   "scripts": {
+    "prestart": "npm run generate-schemas",
     "start": "react-scripts start",
+    "prebuild": "npm run generate-schemas",
     "build": "react-scripts build",
+    "generate-schemas": "npx typescript-json-schema --required --strictNullChecks tsconfig.json ChecklistData --out public/generated/ChecklistDataSchema.json",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -47,6 +50,7 @@
     "@testing-library/jest-dom": "^5.15.0",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.0.2"
+    "@types/jest": "^27.0.2",
+    "typescript-json-schema": "^0.53.0"
   }
 }

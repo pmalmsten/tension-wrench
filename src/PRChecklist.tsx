@@ -4,34 +4,8 @@
 import { Box, Checkbox, CircularProgress, Container, List, ListItem, Paper, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import YAML from "yaml";
-
-interface TaskData {
-    text: string
-}
-
-interface TaskListData {
-    id: string
-    extendsTaskList: string | undefined
-    tasks: TaskData[]
-}
-
-interface ConditionData {
-    taskListToInclude: string | undefined
-    additionalQuestionsToAsk: QuestionData[] | undefined
-}
-
-interface QuestionData {
-    text: string
-    whenTrue: ConditionData | undefined
-    isChecked: boolean
-}
-
-interface ChecklistData {
-    questions: QuestionData[]
-    taskLists: { 
-        [key: string]: TaskListData 
-    }
-}
+import "./ChecklistTypes";
+import { QuestionData, TaskListData, TaskData, ChecklistData } from "./ChecklistTypes";
 
 interface QuestionComponentProps {
     question: QuestionData
