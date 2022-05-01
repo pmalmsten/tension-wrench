@@ -105,23 +105,29 @@ export default function PRChecklist() {
     return (
     <React.Fragment>
         <Container component="main" maxWidth='md' sx={{ mb: 4 }}>
-            {isFullyLoaded && 
-            <React.Fragment>
-                <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-                    <Typography variant="h6" gutterBottom>
-                        Pull Request Checklist
-                    </Typography>
-                    <List>
-                        {dataObj.questions.map((question, index) => {
-                            return <QuestionComponent 
-                                question={question} 
-                                key={question.text}
-                                questionAccessorFn={(allQuestions) => allQuestions[index]}
-                                onCheckedStateChanged={handleCheckedStateChanged}
-                                />
-                        })}
-                    </List>
-                </Paper>
+            <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
+                {!isFullyLoaded && 
+                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <CircularProgress />
+                    </Box>}
+                {isFullyLoaded && 
+                    <React.Fragment>
+                        <Typography variant="h6" gutterBottom>
+                            Pull Request Checklist
+                        </Typography>
+                        <List>
+                            {dataObj.questions.map((question, index) => {
+                                return <QuestionComponent 
+                                    question={question} 
+                                    key={question.text}
+                                    questionAccessorFn={(allQuestions) => allQuestions[index]}
+                                    onCheckedStateChanged={handleCheckedStateChanged}
+                                    />
+                            })}
+                        </List>
+                    </React.Fragment>}
+            </Paper>
+            {isFullyLoaded &&
                 <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
                     {tasksToDisplay.size === 0 && 
                         <Typography variant="h6" gutterBottom>
@@ -142,13 +148,7 @@ export default function PRChecklist() {
                         </React.Fragment>
                     }
                 </Paper>
-            </React.Fragment>}
-            {!isFullyLoaded && 
-                <Paper variant="outlined" sx={{ my: { xs: 3, md: 6 }, p: { xs: 2, md: 3 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                        <CircularProgress />
-                    </Box>
-                </Paper>}
+            }
         </Container>
     </React.Fragment>)
 }
