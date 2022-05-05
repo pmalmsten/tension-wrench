@@ -43,6 +43,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<DiscussionWizard />} />
         <Route path="pr-checklist" element={<PRChecklist />} />
+        <Route path="pr-checklist/:encodedURL" element={<PRChecklist />} />
       </Routes>
       <FloatingFeedbackLink />
       <footer style={{ padding: theme.spacing(2)}}>

@@ -4,6 +4,7 @@
 import { Alert, AlertTitle, Box, Checkbox, CircularProgress, Container, List, ListItem, Paper, Typography } from "@mui/material";
 import Ajv, { ValidateFunction } from "ajv";
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import YAML, { YAMLParseError } from "yaml";
 import "./ChecklistTypes";
 import { QuestionData, TaskListData, TaskData, ChecklistData } from "./ChecklistTypes";
@@ -59,6 +60,7 @@ interface LoadError {
 }
 
 export default function PRChecklist() {
+    const { encodedURL } = useParams()
     const [loadErrorInfo, setLoadErrorInfo] = useState<LoadError | undefined>(undefined)
     const [checklistDataSchema, setChecklistDataSchema] = useState<ValidateFunction<ChecklistData> | undefined>(undefined)
     const [dataObj, setDataObj] = useState<ChecklistData | undefined>(undefined);
@@ -69,7 +71,7 @@ export default function PRChecklist() {
         }
 
         if (checklistDataSchema === undefined) {
-            fetch("generated/ChecklistDataSchema.json")
+            fetch("/generated/ChecklistDataSchema.json")
                 .then(response => {
                     if (!response.ok) {
                         setLoadErrorInfo({
@@ -122,7 +124,7 @@ export default function PRChecklist() {
                     }
                 })
         } else if (dataObj === undefined) {
-            fetch("default-pr-checklist.yml")
+            fetch("/default-pr-checklist.yml")
                 .then(response => {
                     if (!response.ok) {
                         setLoadErrorInfo({
