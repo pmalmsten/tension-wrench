@@ -2,13 +2,15 @@
 // Licensed under the MIT License.
 
 import { Alert, AlertTitle, Box, Checkbox, CircularProgress, Container, List, ListItem, Paper, Typography } from "@mui/material";
-import Ajv, { ValidateFunction } from "ajv";
+import Ajv from "ajv";
 import React, { useEffect, useState } from "react";
 import YAML, { YAMLParseError } from "yaml";
 import "./ChecklistTypes";
 import { QuestionData, TaskListData, TaskData, ChecklistData } from "./ChecklistTypes";
+import prChecklistSchemaData from "./generated/ChecklistDataSchema.json"
 
 const ajv = new Ajv()
+const prChecklistSchema = ajv.compile<ChecklistData>(prChecklistSchemaData)
 
 interface QuestionComponentProps {
     question: QuestionData
@@ -60,7 +62,6 @@ interface LoadError {
 
 export default function PRChecklist() {
     const [loadErrorInfo, setLoadErrorInfo] = useState<LoadError | undefined>(undefined)
-    const [checklistDataSchema, setChecklistDataSchema] = useState<ValidateFunction<ChecklistData> | undefined>(undefined)
     const [dataObj, setDataObj] = useState<ChecklistData | undefined>(undefined);
 
     useEffect(() => {
@@ -68,60 +69,7 @@ export default function PRChecklist() {
             return;
         }
 
-        if (checklistDataSchema === undefined) {
-            fetch("generated/ChecklistDataSchema.json")
-                .then(response => {
-                    if (!response.ok) {
-                        setLoadErrorInfo({
-                            title: "Unable to load checklist schema",
-                            messages: [
-                                response.statusText
-                            ]
-                        })
-                    } else {
-                        response.json()
-                            .then(json => {
-                                try {
-                                    var compiled = ajv.compile<ChecklistData>(json)
-                                    // Wrap with function so that useState setter doesn't immediately call the validation function
-                                    // while attempting to populate the value to store
-                                    setChecklistDataSchema(() => compiled)
-                                } catch (ex) {
-                                    if (ex instanceof Error) {
-                                        setLoadErrorInfo({
-                                            title: "Unable to load checklist schema",
-                                            messages: [
-                                                ex.message
-                                            ]
-                                        })
-                                    } else {
-                                        setLoadErrorInfo({
-                                            title: "Unable to load checklist schema",
-                                            messages: [
-                                                "Unrecognized exception thrown"
-                                            ]
-                                        })
-                                    }
-                                }
-                            })
-                            .catch(ex => {
-                                if (ex instanceof SyntaxError) {
-                                    setLoadErrorInfo({
-                                        title: "Unable to parse checklist data schema as JSON",
-                                        messages: [
-                                            ex.message
-                                        ]
-                                    })
-                                } else {
-                                    setLoadErrorInfo({
-                                        title: "Unable to parse checklist data schema as JSON",
-                                        messages: []
-                                    })
-                                }
-                            })
-                    }
-                })
-        } else if (dataObj === undefined) {
+        if (dataObj === undefined) {
             fetch("default-pr-checklist.yml")
                 .then(response => {
                     if (!response.ok) {
@@ -154,12 +102,12 @@ export default function PRChecklist() {
                                 }
 
 
-                                if (checklistDataSchema(parsed)) {
+                                if (prChecklistSchema(parsed)) {
                                     setDataObj(parsed)
                                 } else {
                                     setLoadErrorInfo({
                                         title: "Loaded checklist data does not conform to expected schema",
-                                        messages: checklistDataSchema.errors?.map(err => `At '${err.instancePath}': ${err.message}`) ?? []
+                                        messages: prChecklistSchema.errors?.map(err => `At '${err.instancePath}': ${err.message}`) ?? []
                                     })
                                 }
                             })

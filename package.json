@@ -30,7 +30,7 @@
     "start": "react-scripts start",
     "prebuild": "npm run generate-schemas",
     "build": "react-scripts build",
-    "generate-schemas": "npx typescript-json-schema --required --strictNullChecks tsconfig.json ChecklistData --out public/generated/ChecklistDataSchema.json",
+    "generate-schemas": "npx typescript-json-schema --required --strictNullChecks tsconfig.json ChecklistData --out src/generated/ChecklistDataSchema.json --include src/ChecklistTypes.ts",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

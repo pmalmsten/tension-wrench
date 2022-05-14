@@ -10,7 +10,7 @@
 
 # production
 /build
-/public/generated
+/src/generated
 
 # IDEs and editors
 /.idea
