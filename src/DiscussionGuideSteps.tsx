@@ -9,6 +9,7 @@ import Warning from "./Warning";
 
 export interface DiscussionGuideStep {
     label: string,
+    type: "Spoofing" | "Tampering" | "Repudiation" | "Information Disclosure" | "Denial of Service" | "Escalation of Priviledge",
     content: JSX.Element
 }
 
@@ -23,6 +24,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
         var componentSteps: DiscussionGuideStep[] = componentTraitNamesSet.has(Traits.OutOfScope.name) ? [] : [
             {
                 label: `${component}: Tampering`,
+                type: "Tampering",
                 content: <Typography>
                     An attacker might try to tamper with this component in order to accomplish their goals.
                     <p>Examples include:
@@ -40,6 +42,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             },
             {
                 label: `${component}: Repudiation`,
+                type: "Repudiation",
                 content: <Typography>
                     An attacker might try to make an action and later claim they did not take that action, or take that action without having been discovered.
                     <p>Examples include:
@@ -64,6 +67,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             },
             {
                 label: `${component}: Information Disclosure`,
+                type: "Information Disclosure",
                 content: <Typography>
                     An attacker might try to extract data they should not have access to from this component.
                     <p>Examples include:
@@ -96,6 +100,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             },
             {
                 label: `${component}: Denial of Service`,
+                type: "Denial of Service",
                 content: <Typography>
                     An attacker might try to cause this component to stop serving legitimate customers/users.
                     <p>Examples include:
@@ -121,6 +126,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             },
             {
                 label: `${component}: Escalation of Privilege`,
+                type: "Escalation of Priviledge",
                 content: <Typography>
                     An attacker might try to take advantage of this component in order to gain access they should not have.
                     <p>Examples include:
@@ -197,14 +203,17 @@ export default function generateSteps(components: string[], componentTraitsMap: 
             .flatMap(destComponent => [
                 {
                     label: `${component} <-> ${destComponent}: Spoofing of '${component}' identity`,
+                    type: "Spoofing",
                     content: createSpoofingStepContent(component, destComponent)
                 },
                 {
                     label: `${component} <-> ${destComponent}: Spoofing of '${destComponent}' identity`,
+                    type: "Spoofing",
                     content: createSpoofingStepContent(destComponent, component),
                 },
                 {
                     label: `${component} <-> ${destComponent}: Tampering`,
+                    type: "Tampering",
                     content: <Typography>
                         An attacker might try to alter information as it flows between these components (for example, as messages transit the public internet).
                         <p>Examples include:
@@ -244,6 +253,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                 },
                 {
                     label: `${component} <-> ${destComponent}: Information Disclosure`,
+                    type: "Information Disclosure",
                     content: <Typography>
                         An attacker might try to spy on information as it flows between these components (for example, as messages transit the public internet).
                         <p>For example:
@@ -276,6 +286,7 @@ export default function generateSteps(components: string[], componentTraitsMap: 
                 },
                 {
                     label: `${component} <-> ${destComponent}: Denial of Service`,
+                    type: "Denial of Service",
                     content: <Typography>
                         An attacker might try to disrupt the exchange of information between these components (for example, as messages transit the public internet).
                         <p>For example:

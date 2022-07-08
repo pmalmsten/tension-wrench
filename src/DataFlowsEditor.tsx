@@ -68,7 +68,7 @@ function NewDataFlowForm(props: {
 export default function DataFlowsEditor(props: DataFlowEditorProps) {
   return (
     <React.Fragment>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         Add Data Flows
       </Typography>
       <p>

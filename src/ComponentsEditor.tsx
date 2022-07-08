@@ -51,7 +51,7 @@ export default function ComponentsEditor(props: ComponentsEditorProps) {
 
   return (
     <React.Fragment>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         Add Components
       </Typography>
       <p>

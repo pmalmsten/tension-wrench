@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import Typography from '@mui/material/Typography';
-import { Box, Button, Step, StepButton, StepContent, Stepper } from '@mui/material';
+import { Box, Button, FormControlLabel, Step, StepButton, StepContent, Stepper, Switch } from '@mui/material';
 import { Trait } from './ComponentTraits';
 import GenerateSteps, { DiscussionGuideStep } from './DiscussionGuideSteps';
 
@@ -111,10 +111,51 @@ function VerticalLinearStepper(props: StepperProps) {
   );
 }
 
+function AllTopicsInOrder(props: StepperProps) {
+ return <VerticalLinearStepper steps={props.steps} />
+}
+
+function TopicsGroupedByType(props: StepperProps) {
+  return <React.Fragment>
+    <Typography variant="h6" gutterBottom>
+      Spoofing
+    </Typography>
+    <VerticalLinearStepper steps={props.steps.filter(it => it.type === "Spoofing")} />
+
+    <Typography variant="h6" gutterBottom>
+      Tampering
+    </Typography>
+    <VerticalLinearStepper steps={props.steps.filter(it => it.type === "Tampering")} />
+
+    <Typography variant="h6" gutterBottom>
+      Repudiation
+    </Typography>
+    <VerticalLinearStepper steps={props.steps.filter(it => it.type === "Repudiation")} />
+
+    <Typography variant="h6" gutterBottom>
+      Information Disclosure
+    </Typography>
+    <VerticalLinearStepper steps={props.steps.filter(it => it.type === "Information Disclosure")} />
+
+    <Typography variant="h6" gutterBottom>
+      Denial of Service
+    </Typography>
+    <VerticalLinearStepper steps={props.steps.filter(it => it.type === "Denial of Service")} />
+
+    <Typography variant="h6" gutterBottom>
+      Escalation of Priviledge
+    </Typography>
+    <VerticalLinearStepper steps={props.steps.filter(it => it.type === "Escalation of Priviledge")} />
+  </React.Fragment>
+}
+
 export default function DiscussionGuide(props: DiscussionGuideProps) {
+  var [groupByType, setGroupByType] = React.useState(false);
+  var steps = GenerateSteps(props.components, props.componentTraitsMap, props.dataFlows)
+
   return (
     <React.Fragment>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         Discussion Guide
       </Typography>
       <p>
@@ -124,7 +165,19 @@ export default function DiscussionGuide(props: DiscussionGuideProps) {
         brainstorming - all ideas are fair game, even if you later decide a possible 
         attack is too unlikely or too low impact to do anything about.
       </p>
-      <VerticalLinearStepper steps={GenerateSteps(props.components, props.componentTraitsMap, props.dataFlows)} />
+
+      <FormControlLabel 
+        control={
+          <Switch 
+            checked={groupByType} 
+            onChange={(e) => setGroupByType(e.currentTarget.checked) }
+          />
+        } 
+        label="Group Topics by Category"
+      />
+
+      {groupByType && <TopicsGroupedByType steps={steps} />}
+      {!groupByType && <AllTopicsInOrder steps={steps} />}
       
     </React.Fragment>
   );
