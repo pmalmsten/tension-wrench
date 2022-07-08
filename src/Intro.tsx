@@ -8,7 +8,7 @@ import Info from './Info';
 export default function Intro() {
   return (
     <React.Fragment>
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         Welcome!
       </Typography>
       <p>

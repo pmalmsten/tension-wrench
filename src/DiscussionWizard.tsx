@@ -165,7 +165,7 @@ export default function DiscussionWizard() {
         }}
       >
         <Toolbar>
-          <Typography variant="h6" color="inherit" noWrap>
+          <Typography variant="h5" color="inherit" noWrap>
             Tension Wrench - Learn to Defend against Hackers
           </Typography>
         </Toolbar>
