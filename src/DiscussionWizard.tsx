@@ -21,6 +21,7 @@ import DataFlowsEditor from './DataFlowsEditor';
 import DiscussionGuide from './DiscussionGuide';
 import { Trait } from './ComponentTraits';
 import { ThemeProvider } from '@mui/system';
+import { List, Set, Map } from 'immutable';
 
 function Copyright() {
   return (
@@ -37,11 +38,49 @@ function Copyright() {
 
 const steps = ['Intro', 'Components', 'Data Flows', 'Discussion Guide'];
 
+type ComponentName = string
+
+interface IComponent {
+  readonly name: ComponentName
+  readonly outOfScope: boolean
+}
+interface DataFlow {
+  readonly srcComponentName: ComponentName,
+  readonly destComponentName: ComponentName
+}
+
+type IThreatRef = INonSpoofingThreatRef | ISpoofingRef
+
+interface INonSpoofingThreatRef {
+  readonly strideType: "tampering" | "repudiation" | "infoDisclosure" | "denialOfService" | "escalationOfPrivilege",
+  readonly appliesTo: ComponentName | DataFlow
+}
+
+interface ISpoofingRef { 
+  readonly strideType: "spoofing",
+  readonly appliesTo: DataFlow,
+  readonly relevantComponentIdentity: ComponentName
+}
+
+interface DiscussionModel {
+  readonly components: List<IComponent>,
+  readonly dataFlows: List<DataFlow>,
+  readonly completedDiscussionTopics: Set<ITypedMap<IThreatRef>>
+}
+
 export default function DiscussionWizard() {
+  // Transient states
   const [activeStep, setActiveStep] = React.useState(0);
+
+  // Saved states
   const [components, setComponents] = React.useState<string[]>([]);
   const [componentTraitsMap, setComponentTraitsMap] = React.useState(new Map<string, Trait[]>())
   const [dataFlows, setDataFlows] = React.useState(new Map<string, Set<string>>())
+  const [systemModel, setSystemModel] = React.useState<DiscussionModel>({
+    components: List<IComponent>(),
+    dataFlows: List<DataFlow>(),
+    completedDiscussionTopics: Set<IThreatRef>(),
+  })
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);

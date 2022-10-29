@@ -11,6 +11,7 @@
     "@mui/material": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "immutable": "^4.1.0",
     "react": "latest",
     "react-dom": "latest",
     "react-scripts": "latest",
