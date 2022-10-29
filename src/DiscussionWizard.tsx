@@ -19,9 +19,9 @@ import Intro from './Intro'
 import ComponentsEditor from './ComponentsEditor';
 import DataFlowsEditor from './DataFlowsEditor';
 import DiscussionGuide from './DiscussionGuide';
-import { Trait } from './ComponentTraits';
+import { Trait, Traits } from './ComponentTraits';
 import { ThemeProvider } from '@mui/system';
-import { List, Set, Map } from 'immutable';
+import { useImmer } from "use-immer"
 
 function Copyright() {
   return (
@@ -41,7 +41,6 @@ const steps = ['Intro', 'Components', 'Data Flows', 'Discussion Guide'];
 type ComponentName = string
 
 interface IComponent {
-  readonly name: ComponentName
   readonly outOfScope: boolean
 }
 interface DataFlow {
@@ -49,23 +48,30 @@ interface DataFlow {
   readonly destComponentName: ComponentName
 }
 
-type IThreatRef = INonSpoofingThreatRef | ISpoofingRef
+type IDiscussionTopicKey = INonSpoofingTopicKey | ISpoofingTopicKey
 
-interface INonSpoofingThreatRef {
+interface INonSpoofingTopicKey {
   readonly strideType: "tampering" | "repudiation" | "infoDisclosure" | "denialOfService" | "escalationOfPrivilege",
   readonly appliesTo: ComponentName | DataFlow
 }
 
-interface ISpoofingRef { 
+interface ISpoofingTopicKey { 
   readonly strideType: "spoofing",
   readonly appliesTo: DataFlow,
   readonly relevantComponentIdentity: ComponentName
 }
 
+interface IDiscussionTopic {
+  readonly key: IDiscussionTopicKey
+  readonly hasBeenDiscussed: boolean
+}
+
+type DiscussionTopicByTopicKey = Record<string, IDiscussionTopic>
+
 interface DiscussionModel {
-  readonly components: List<IComponent>,
-  readonly dataFlows: List<DataFlow>,
-  readonly completedDiscussionTopics: Set<ITypedMap<IThreatRef>>
+  readonly componentsByName: Record<string, IComponent>,
+  readonly dataFlows: DataFlow[],
+  readonly discussionTopics: DiscussionTopicByTopicKey
 }
 
 export default function DiscussionWizard() {
@@ -76,10 +82,10 @@ export default function DiscussionWizard() {
   const [components, setComponents] = React.useState<string[]>([]);
   const [componentTraitsMap, setComponentTraitsMap] = React.useState(new Map<string, Trait[]>())
   const [dataFlows, setDataFlows] = React.useState(new Map<string, Set<string>>())
-  const [systemModel, setSystemModel] = React.useState<DiscussionModel>({
-    components: List<IComponent>(),
-    dataFlows: List<DataFlow>(),
-    completedDiscussionTopics: Set<IThreatRef>(),
+  const [systemModel, setSystemModel] = useImmer<DiscussionModel>({
+    componentsByName: {},
+    dataFlows: [],
+    discussionTopics: {}
   })
 
   const handleNext = () => {
@@ -89,6 +95,15 @@ export default function DiscussionWizard() {
   const handleBack = () => {
     setActiveStep(activeStep - 1);
   };
+
+  // New state functions
+  const markComponentOutOfScope = (componentName: string, outOfScope: boolean) => {
+    setSystemModel(draft => {
+      draft.componentsByName[componentName].outOfScope = outOfScope
+    })
+  }
+
+  // Old state functions
 
   const setComponentTraits = (component: string, selectedTraits: Trait[] | undefined) => {
     var updatedComponentTraitsMap = new Map(Array.from(componentTraitsMap, ([key, value]: [string, Trait[]]) => [key, Array.from(value)]))
@@ -100,6 +115,7 @@ export default function DiscussionWizard() {
     }
 
     setComponentTraitsMap(updatedComponentTraitsMap)
+    markComponentOutOfScope(component, selectedTraits?.includes(Traits.OutOfScope) || false)
   }
 
   const addComponentTrait = (component: string, trait: Trait) => {
@@ -115,6 +131,10 @@ export default function DiscussionWizard() {
     }
 
     setComponentTraitsMap(updatedComponentTraitsMap)
+
+    if (trait === Traits.OutOfScope) {
+      markComponentOutOfScope(component, true)
+    }
   }
 
   const removeComponentTrait = (component: string, trait: Trait) => {
@@ -128,6 +148,10 @@ export default function DiscussionWizard() {
     componentTraits = componentTraits.filter(it => it.name !== trait.name)
     updatedComponentTraitsMap.set(component, componentTraits)
     setComponentTraitsMap(updatedComponentTraitsMap)
+
+    if (trait === Traits.OutOfScope) {
+      markComponentOutOfScope(component, false)
+    }
   }
 
   const componentHasTrait = (component: string, trait: Trait) => {
@@ -145,6 +169,10 @@ export default function DiscussionWizard() {
 
     setComponents(Array.from(updatedComponents.values()))
     setComponentTraits(component, [])
+
+    setSystemModel(draft => {
+      draft.componentsByName[component] = { outOfScope: false }
+    })
   };
 
   const deepCopyDataFlowsMap = () => new Map(Array.from(dataFlows, ([key, value]: [string, Set<string>]) => [key, new Set(value)]))
@@ -164,6 +192,12 @@ export default function DiscussionWizard() {
     setComponents(components.filter(c => c !== removedComponent))
     deleteDataFlowsReferencingComponent(removedComponent)
     setComponentTraits(removedComponent, undefined)
+
+    setSystemModel(draft => {
+      delete draft.componentsByName[removedComponent]
+      draft.dataFlows = draft.dataFlows.filter(it => it.destComponentName !== removedComponent && it.srcComponentName !== removedComponent)
+      // TODO: unmark related discussion topics
+    });
   };
 
   const dataFlowExists = (sourceComponent: string, destComponent: string) => 
