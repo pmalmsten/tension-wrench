@@ -40,37 +40,94 @@ const steps = ['Intro', 'Components', 'Data Flows', 'Discussion Guide'];
 
 type ComponentName = string
 
+interface IConcernsComponent {
+  referencesComponent(componentName: ComponentName): boolean
+}
+
 interface IComponent {
   readonly outOfScope: boolean
 }
-interface DataFlow {
-  readonly srcComponentName: ComponentName,
-  readonly destComponentName: ComponentName
+class DataFlow implements IConcernsComponent {
+  constructor(readonly srcComponentName: ComponentName, readonly destComponentName: ComponentName) {}
+
+  referencesComponent(componentName: ComponentName) {
+    return this.srcComponentName === componentName || this.destComponentName === componentName
+  }
 }
 
-type IDiscussionTopicKey = INonSpoofingTopicKey | ISpoofingTopicKey
+type IDiscussionTopicKey = NonSpoofingTopicKey | ISpoofingTopicKey
 
-interface INonSpoofingTopicKey {
-  readonly strideType: "tampering" | "repudiation" | "infoDisclosure" | "denialOfService" | "escalationOfPrivilege",
-  readonly appliesTo: ComponentName | DataFlow
+class NonSpoofingTopicKey implements IConcernsComponent {
+  constructor(
+    readonly strideType: "tampering" | "repudiation" | "infoDisclosure" | "denialOfService" | "escalationOfPrivilege",
+    readonly appliesTo: ComponentName | DataFlow
+  ) {}
+
+  referencesComponent(componentName: ComponentName) {
+    return (typeof(this.appliesTo) === "string" && this.appliesTo === componentName ) || (typeof(this.appliesTo) === "object" && this.appliesTo.referencesComponent(componentName))
+  }
 }
 
-interface ISpoofingTopicKey { 
-  readonly strideType: "spoofing",
-  readonly appliesTo: DataFlow,
-  readonly relevantComponentIdentity: ComponentName
+class ISpoofingTopicKey implements IConcernsComponent { 
+  constructor(
+    readonly strideType: "spoofing",
+    readonly appliesTo: DataFlow,
+    readonly relevantComponentIdentity: ComponentName
+  ) {}
+
+  referencesComponent(componentName: string): boolean {
+    return this.appliesTo.referencesComponent(componentName) || this.relevantComponentIdentity === componentName
+  }
 }
 
-interface IDiscussionTopic {
-  readonly key: IDiscussionTopicKey
-  readonly hasBeenDiscussed: boolean
+function discussionKeyToString(key: IDiscussionTopicKey) {
+  switch (key.strideType) {
+    case "spoofing":
+      return [key.strideType, key.appliesTo.srcComponentName, key.appliesTo.destComponentName, key.relevantComponentIdentity].join("/")
+    default:
+      if (typeof(key.appliesTo) === "object") {
+        return [key.strideType, key.appliesTo.srcComponentName, key.appliesTo.destComponentName].join("/")
+      }
+
+      return [key.strideType, key.appliesTo].join("/")
+  }
+}
+
+function indexTopics(topics: IDiscussionTopic[]): Record<string, IDiscussionTopic> {
+  var result: Record<string, IDiscussionTopic> = {}
+  topics.forEach(topic => result[discussionKeyToString(topic.key)] = topic)
+  return result
+}
+
+function indexDataFlows(dataFlows: DataFlow[]): Map<string, Map<string, DataFlow>> {
+  var result = new Map<string, Map<string, DataFlow>>();
+  dataFlows.forEach(dataFlow => {
+    // forward direction
+    result.set(dataFlow.srcComponentName, (result.get(dataFlow.srcComponentName) ?? new Map<string, DataFlow>()).set(dataFlow.destComponentName, dataFlow))
+
+    // reverse direction
+    result.set(dataFlow.destComponentName, (result.get(dataFlow.destComponentName) ?? new Map<string, DataFlow>()).set(dataFlow.srcComponentName, dataFlow))
+  })
+
+  return result
+}
+
+class IDiscussionTopic implements IConcernsComponent {
+  constructor(
+    readonly key: IDiscussionTopicKey,
+    readonly hasBeenDiscussed: boolean
+  ) {}
+
+  referencesComponent(componentName: string): boolean {
+    return this.key.referencesComponent(componentName)
+  }
 }
 
 type DiscussionTopicByTopicKey = Record<string, IDiscussionTopic>
 
 interface DiscussionModel {
   readonly componentsByName: Record<string, IComponent>,
-  readonly dataFlows: DataFlow[],
+  readonly dataFlows: Map<string, Map<string, DataFlow>>,
   readonly discussionTopics: DiscussionTopicByTopicKey
 }
 
@@ -84,7 +141,7 @@ export default function DiscussionWizard() {
   const [dataFlows, setDataFlows] = React.useState(new Map<string, Set<string>>())
   const [systemModel, setSystemModel] = useImmer<DiscussionModel>({
     componentsByName: {},
-    dataFlows: [],
+    dataFlows: new Map<string, Map<string, DataFlow>>(),
     discussionTopics: {}
   })
 
@@ -195,8 +252,8 @@ export default function DiscussionWizard() {
 
     setSystemModel(draft => {
       delete draft.componentsByName[removedComponent]
-      draft.dataFlows = draft.dataFlows.filter(it => it.destComponentName !== removedComponent && it.srcComponentName !== removedComponent)
-      // TODO: unmark related discussion topics
+      draft.dataFlows = indexDataFlows(Array.from(draft.dataFlows.values()).flatMap(it => Array.from(it.values())).filter(it => !it.referencesComponent(removedComponent)))
+      draft.discussionTopics = indexTopics(Object.values(draft.discussionTopics).filter(it => !it.referencesComponent(removedComponent)))
     });
   };
 
