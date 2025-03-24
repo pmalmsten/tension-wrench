@@ -7,7 +7,7 @@
   "dependencies": {
     "@emotion/react": "latest",
     "@emotion/styled": "latest",
-    "@mui/icons-material": "^5.16.14",
+    "@mui/icons-material": "^5.17.1",
     "@mui/material": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
